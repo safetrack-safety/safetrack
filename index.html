@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
   <style>
     :root {
@@ -1248,13 +1249,13 @@
         <div class="list-toolbar">
           <div>
             <h2 class="card-title">รายการความเสี่ยงทั้งหมด</h2>
-            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE ส่งออก Excel และสั่งพิมพ์รายงาน</div>
+            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE ส่งออก Excel (.xlsx) และสั่งพิมพ์รายงาน</div>
           </div>
 
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button type="button" class="btn btn-excel btn-small" onclick="exportReportsToExcel()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              ส่งออกไฟล์ Excel
+              ส่งออกไฟล์ Excel (.xlsx)
             </button>
             <button type="button" class="btn btn-primary btn-small" onclick="printFilteredReports()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -2041,7 +2042,7 @@
     }
   }
 
-  /* ===== Export to Excel (.CSV UTF-8 BOM) ===== */
+  /* ===== Export to Native Excel (.XLSX) with Auto Column Widths ===== */
   function exportReportsToExcel() {
     const targetList = (Array.isArray(filteredRiskReports) && filteredRiskReports.length > 0)
       ? filteredRiskReports
@@ -2073,12 +2074,7 @@
       'ลิงก์ภาพหลังแก้ไข'
     ];
 
-    const escapeCsv = (val) => {
-      const str = String(val == null ? '' : val).replace(/"/g, '""');
-      return `"${str}"`;
-    };
-
-    const rows = targetList.map(r => {
+    const dataRows = targetList.map(r => {
       const corrections = Array.isArray(r.corrections) ? r.corrections : [];
       const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : {};
       return [
@@ -2100,24 +2096,50 @@
         latestCorr.recordedBy || '',
         r.beforeImageUrl || '',
         latestCorr.afterImageUrl || ''
-      ].map(escapeCsv).join(',');
+      ];
     });
-
-    const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows].join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
 
     const now = new Date();
     const dateStamp = `${now.getFullYear() + 543}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `SafeTrack_Report_${dateStamp}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
 
-    showToast(`ดาวน์โหลดไฟล์ Excel (${targetList.length} รายการ) สำเร็จ!`);
+    if (typeof XLSX !== 'undefined') {
+      const aoa = [headers, ...dataRows];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+      // คำนวณความกว้างคอลัมน์อัตโนมัติ (เผื่อระยะสำหรับภาษาไทยและวันที่)
+      const colWidths = headers.map((headerText, colIdx) => {
+        let maxLen = String(headerText).length;
+        dataRows.forEach(row => {
+          const cellStr = String(row[colIdx] || '');
+          const firstLine = cellStr.split('\n')[0];
+          if (firstLine.length > maxLen) {
+            maxLen = firstLine.length;
+          }
+        });
+        return { wch: Math.min(Math.max(maxLen + 6, 15), 48) };
+      });
+      ws['!cols'] = colWidths;
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'รายการความเสี่ยง');
+      XLSX.writeFile(wb, `SafeTrack_Report_${dateStamp}.xlsx`);
+
+      showToast(`ดาวน์โหลดไฟล์ Excel (.xlsx) จำนวน ${targetList.length} รายการ สำเร็จ!`);
+    } else {
+      // ระบบสำรองกรณีโหลดไลบรารีไม่ได้ (Offline)
+      const escapeCsv = (val) => `"${String(val == null ? '' : val).replace(/"/g, '""')}"`;
+      const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...dataRows.map(row => row.map(escapeCsv).join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SafeTrack_Report_${dateStamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast(`ดาวน์โหลดไฟล์ตารางข้อมูล (${targetList.length} รายการ) สำเร็จ!`);
+    }
   }
 
   function openImageLightbox(imgSrc, captionText) {
