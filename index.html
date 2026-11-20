@@ -848,6 +848,7 @@
 
 <body>
 <div class="toast-container" id="toastContainer"></div>
+<datalist id="userListDatalist"></datalist>
 
 <div class="app">
 
@@ -1074,9 +1075,7 @@
                 <span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                 ผู้รายงาน (จป. / ผู้ช่วย จป.)<span class="required">*</span>
               </label>
-              <select id="reporterSelect" required>
-                <option value="">กำลังโหลดรายชื่อ...</option>
-              </select>
+              <input type="text" id="reporterSelect" list="userListDatalist" placeholder="พิมพ์ชื่อผู้รายงาน (จป. / ผู้ช่วย จป.)" required>
             </div>
 
             <div class="form-group">
@@ -1122,9 +1121,7 @@
 
             <div class="form-group">
               <label for="supervisorSelect">ผู้ควบคุมงาน / ผู้รับผิดชอบ</label>
-              <select id="supervisorSelect">
-                <option value="">เลือกผู้รับผิดชอบ (ถ้ามี)</option>
-              </select>
+              <input type="text" id="supervisorSelect" list="userListDatalist" placeholder="พิมพ์ชื่อผู้รับผิดชอบ (ถ้ามี)">
             </div>
 
             <div class="form-group full">
@@ -1303,9 +1300,7 @@
 
             <div class="form-group full">
               <label for="correctionRecordedBy">ผู้ตรวจสอบและบันทึกผล (จป. / ผู้ช่วย จป.)<span class="required">*</span></label>
-              <select id="correctionRecordedBy" required>
-                <option value="">เลือกผู้บันทึกผล</option>
-              </select>
+              <input type="text" id="correctionRecordedBy" list="userListDatalist" placeholder="พิมพ์ชื่อผู้ตรวจสอบและบันทึกผล (จป. / ผู้ช่วย จป.)" required>
             </div>
 
             <div class="form-group full">
@@ -1580,9 +1575,17 @@
       areaData = res.areas || [];
       userData = res.users || [];
 
-      populateSelect('reporterSelect', userData, 'fullName', 'fullName', 'เลือกผู้รายงาน');
-      populateSelect('supervisorSelect', userData, 'fullName', 'fullName', 'เลือกผู้รับผิดชอบ (ถ้ามี)');
-      populateSelect('correctionRecordedBy', userData, 'fullName', 'fullName', 'เลือกผู้ตรวจสอบและบันทึกผล');
+      const datalist = document.getElementById('userListDatalist');
+      if (datalist) {
+        datalist.innerHTML = '';
+        userData.forEach(item => {
+          if (item.fullName) {
+            const opt = document.createElement('option');
+            opt.value = item.fullName;
+            datalist.appendChild(opt);
+          }
+        });
+      }
 
       const sections = [...new Set(areaData.map(a => a.section).filter(Boolean))];
       const sectionSelect = document.getElementById('sectionSelect');
@@ -1596,18 +1599,6 @@
 
       populateReportAreaFilter();
     }).catch(err => console.error('Master data error:', err));
-  }
-
-  function populateSelect(elId, list, valKey, labelKey, placeholder) {
-    const select = document.getElementById(elId);
-    if (!select) return;
-    select.innerHTML = `<option value="">${placeholder}</option>`;
-    list.forEach(item => {
-      const opt = document.createElement('option');
-      opt.value = item[valKey];
-      opt.textContent = item[labelKey];
-      select.appendChild(opt);
-    });
   }
 
   function updateAreaOptions() {
@@ -1813,14 +1804,14 @@
 
     const payload = {
       reportDateTime: document.getElementById('reportDateTime').value,
-      reporter: document.getElementById('reporterSelect').value,
+      reporter: document.getElementById('reporterSelect').value.trim(),
       areaId: document.getElementById('areaSelect').value,
       locationDetail: document.getElementById('locationDetail').value.trim(),
       hazardCategory: document.getElementById('hazardCategory').value,
       unsafeCondition: document.getElementById('unsafeCondition').value.trim(),
       potentialIncident: document.getElementById('potentialIncident').value.trim(),
       longTermControl: document.getElementById('longTermControl').value.trim(),
-      supervisor: document.getElementById('supervisorSelect').value,
+      supervisor: document.getElementById('supervisorSelect').value.trim(),
       beforeImage: attachedImage
     };
 
@@ -2229,7 +2220,7 @@
       correctionDateTime: document.getElementById('correctionDateTime').value,
       correctedBy: document.getElementById('correctedBy').value.trim(),
       correctionDetail: document.getElementById('correctionDetail').value.trim(),
-      recordedBy: document.getElementById('correctionRecordedBy').value,
+      recordedBy: document.getElementById('correctionRecordedBy').value.trim(),
       afterImageDataUrl: attachedAfterImage ? attachedAfterImage.dataUrl : ''
     };
 
