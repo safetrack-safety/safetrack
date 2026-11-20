@@ -415,6 +415,7 @@
       border: 1px solid var(--border);
       background: #f1f5f9;
       flex-shrink: 0;
+      cursor: zoom-in;
     }
     .report-card-body { min-width: 0; flex: 1; }
 
@@ -495,6 +496,7 @@
       border-radius: 8px;
       background: #fff;
       border: 1px solid var(--border);
+      cursor: zoom-in;
     }
 
     .before-image-link {
@@ -514,7 +516,23 @@
     .filter-group label { font-size: 12px; color: #526579; }
     .report-result-count { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
 
-    /* ===== Dashboard ===== */
+    /* ===== Dashboard & Overdue Alert ===== */
+    .overdue-banner {
+      background: linear-gradient(135deg, #fff8eb 0%, #fff1d6 100%);
+      border: 1.5px solid #f6c87a;
+      border-left: 5px solid #d98218;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .overdue-title { font-size: 14px; font-weight: 800; color: #9a5306; display: flex; align-items: center; gap: 7px; }
+    .overdue-desc { font-size: 13px; color: #7c470b; margin-top: 2px; }
+
     .dashboard-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
 
@@ -588,7 +606,7 @@
     .history-description { font-size: 13px; color: #4e6174; line-height: 1.55; }
     .history-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
 
-    /* ===== LINE Share Modal ===== */
+    /* ===== LINE Share Modal & Image Lightbox ===== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -636,6 +654,34 @@
       font-size: 12.5px;
       margin-bottom: 14px;
       line-height: 1.5;
+    }
+
+    .lightbox-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      background: rgba(10, 20, 32, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      cursor: zoom-out;
+    }
+    .lightbox-img {
+      max-width: 95vw;
+      max-height: 82vh;
+      border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      object-fit: contain;
+      background: #fff;
+    }
+    .lightbox-caption {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 12px;
+      text-align: center;
     }
 
     .fab-add { display: none; }
@@ -852,6 +898,7 @@
       </div>
 
       <div id="dashboardMessage" class="message"></div>
+      <div id="overdueAlertContainer"></div>
 
       <div class="dashboard-stats">
         <div class="stat-card">
@@ -1072,7 +1119,7 @@
         <div class="list-toolbar">
           <div>
             <h2 class="card-title">รายการความเสี่ยงทั้งหมด</h2>
-            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After และสั่งพิมพ์รายงาน</div>
+            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE และสั่งพิมพ์รายงาน</div>
           </div>
 
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -1120,10 +1167,14 @@
         <div class="list-toolbar">
           <div>
             <h2 class="card-title">รายละเอียดรายงานความเสี่ยงและผลการแก้ไข</h2>
-            <div class="card-description" style="margin-bottom:0">แสดงข้อมูลครบถ้วนพร้อมภาพเปรียบเทียบก่อน-หลังแก้ไข</div>
+            <div class="card-description" style="margin-bottom:0">คลิกที่รูปภาพเพื่อขยายเต็มจอ หรือกดแชร์เข้ากลุ่ม LINE และพิมพ์ A4</div>
           </div>
 
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-line btn-small" onclick="shareCurrentReportToLine()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              แชร์เข้า LINE
+            </button>
             <button type="button" class="btn btn-primary btn-small" onclick="printCurrentRiskReport()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               พิมพ์รายงานนี้ (A4)
@@ -1748,6 +1799,56 @@
     }
   }
 
+  function shareCurrentReportToLine() {
+    if (!currentReportForPrint) return;
+    const r = currentReportForPrint;
+    const isCompleted = r.status === 'แจ้งผลการแก้ไขแล้ว';
+    const corrections = Array.isArray(r.corrections) ? r.corrections : [];
+    const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : null;
+    const areaText = [r.section, r.areaName].filter(Boolean).join(' / ');
+
+    if (isCompleted && latestCorr) {
+      openLineShareModal('correction', {
+        reportId: r.reportId,
+        correctionDateTime: latestCorr.correctionDateTime,
+        areaText: areaText,
+        locationDetail: r.locationDetail,
+        correctionDetail: latestCorr.correctionDetail,
+        correctedBy: latestCorr.correctedBy,
+        recordedBy: latestCorr.recordedBy,
+        imageUrl: latestCorr.afterImageUrl || ''
+      });
+    } else {
+      openLineShareModal('report', {
+        reportId: r.reportId,
+        reportDateTime: r.reportDateTime,
+        areaText: areaText,
+        locationDetail: r.locationDetail,
+        hazardCategory: r.hazardCategory,
+        unsafeCondition: r.unsafeCondition,
+        supervisor: r.supervisor || '-',
+        reporter: r.reporter,
+        imageUrl: r.beforeImageUrl || ''
+      });
+    }
+  }
+
+  function openImageLightbox(imgSrc, captionText) {
+    if (!imgSrc) return;
+    const old = document.getElementById('imageLightboxBackdrop');
+    if (old) old.remove();
+
+    const div = document.createElement('div');
+    div.className = 'lightbox-backdrop';
+    div.id = 'imageLightboxBackdrop';
+    div.onclick = () => div.remove();
+    div.innerHTML = `
+      <img class="lightbox-img" src="${escapeHtml(imgSrc)}" alt="ขยายภาพ">
+      <div class="lightbox-caption">${escapeHtml(captionText || 'คลิกที่ว่างเพื่อปิดภาพขยาย')}</div>
+    `;
+    document.body.appendChild(div);
+  }
+
   function populateReportAreaFilter() {
     const select = document.getElementById('reportAreaFilter');
     const prev = select.value;
@@ -1793,12 +1894,13 @@
     filteredRiskReports.forEach(report => {
       const isCompleted = report.status === 'แจ้งผลการแก้ไขแล้ว';
       const thumbUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w240');
+      const fullImgUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w1000');
       const card = document.createElement('div');
       card.className = 'report-card';
 
       card.innerHTML = `
         <div class="report-card-main">
-          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onerror="this.style.display='none'">` : ''}
+          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onclick="openImageLightbox('${escapeHtml(fullImgUrl)}', '${escapeHtml(report.reportId)} (คลิกที่ว่างเพื่อปิด)')" onerror="this.style.display='none'">` : ''}
           <div class="report-card-body">
             <div class="report-id">${escapeHtml(report.reportId)}</div>
             <div class="report-location">${escapeHtml(report.locationDetail || 'ไม่ระบุตำแหน่ง')}</div>
@@ -1881,6 +1983,7 @@
     if (!imgSrc) return `<div class="detail-value" style="color:var(--muted); padding:20px 0;">ไม่มีภาพถ่ายแนบ</div>`;
     return `
       <img class="report-detail-image" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(altText)}"
+           onclick="openImageLightbox('${escapeHtml(imgSrc)}', '${escapeHtml(altText)} (คลิกที่ว่างเพื่อปิด)')"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
       <div style="display:none; font-size:12px; color:var(--muted); padding:10px 0;">ไม่สามารถแสดงตัวอย่างภาพได้ กรุณากดลิงก์ด้านล่าง</div>
       <a class="before-image-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">เปิดดูภาพต้นฉบับใน Drive ↗</a>
@@ -1912,11 +2015,12 @@
 
     pendingList.forEach(report => {
       const thumbUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w240');
+      const fullImgUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w1000');
       const card = document.createElement('div');
       card.className = 'report-card';
       card.innerHTML = `
         <div class="report-card-main">
-          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onerror="this.style.display='none'">` : ''}
+          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onclick="openImageLightbox('${escapeHtml(fullImgUrl)}', '${escapeHtml(report.reportId)} (คลิกที่ว่างเพื่อปิด)')" onerror="this.style.display='none'">` : ''}
           <div class="report-card-body">
             <div class="report-id">${escapeHtml(report.reportId)}</div>
             <div class="report-location">${escapeHtml(report.locationDetail)}</div>
@@ -2181,6 +2285,32 @@
     const completed = reports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
     const pending = reports.length - completed;
 
+    const alertBox = document.getElementById('overdueAlertContainer');
+    if (alertBox) {
+      const pendingItems = reports
+        .filter(r => r.status !== 'แจ้งผลการแก้ไขแล้ว')
+        .map(r => ({ report: r, date: parseThaiDate(r.reportDateTime) }))
+        .filter(x => x.date !== null)
+        .sort((a, b) => a.date - b.date);
+
+      if (pendingItems.length > 0) {
+        const oldest = pendingItems[0];
+        const diffDays = Math.max(0, Math.floor((new Date() - oldest.date) / (1000 * 60 * 60 * 24)));
+        const dayText = diffDays === 0 ? 'วันนี้' : `ค้างมาแล้ว ${diffDays} วัน`;
+        alertBox.innerHTML = `
+          <div class="overdue-banner">
+            <div>
+              <div class="overdue-title">⚠️ รายการค้างแก้ไขนานที่สุด: ${escapeHtml(oldest.report.reportId)} (${dayText})</div>
+              <div class="overdue-desc">พื้นที่: ${escapeHtml([oldest.report.section, oldest.report.areaName].filter(Boolean).join(' / '))} — ${escapeHtml(oldest.report.locationDetail)}</div>
+            </div>
+            <button type="button" class="btn btn-orange btn-small" onclick="switchPage('corrections')">ไปบันทึกผลแก้ไข →</button>
+          </div>
+        `;
+      } else {
+        alertBox.innerHTML = '';
+      }
+    }
+
     const statusEl = document.getElementById('statusOverview');
     statusEl.innerHTML = reports.length === 0
       ? '<div class="empty-state">ยังไม่มีรายงานความเสี่ยงในระบบ</div>'
@@ -2296,7 +2426,7 @@
 
   function printDashboard() {
     const clone = document.getElementById('page-dashboard').cloneNode(true);
-    clone.querySelectorAll('.dashboard-actions, #dashboardMessage, .stat-icon-badge').forEach(el => el.remove());
+    clone.querySelectorAll('.dashboard-actions, #dashboardMessage, .stat-icon-badge, #overdueAlertContainer').forEach(el => el.remove());
     const printWin = window.open('', '_blank');
     if (!printWin) return alert('กรุณาอนุญาต Pop-up เพื่อสั่งพิมพ์');
 
