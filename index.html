@@ -377,6 +377,8 @@
     .btn-line:hover { background: #05b34c; }
     .btn-orange { background: #f39200; color: #ffffff; }
     .btn-orange:hover { background: #d98200; }
+    .btn-excel { background: #1d6f42; color: #ffffff; }
+    .btn-excel:hover { background: #155331; }
     .btn-small { padding: 9px 14px; font-size: 13px; border-radius: 8px; }
     .message {
       padding: 13px 16px;
@@ -1176,10 +1178,14 @@
         <div class="list-toolbar">
           <div>
             <h2 class="card-title">รายการความเสี่ยงทั้งหมด</h2>
-            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE และสั่งพิมพ์รายงาน</div>
+            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE ส่งออก Excel และสั่งพิมพ์รายงาน</div>
           </div>
 
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-excel btn-small" onclick="exportReportsToExcel()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              ส่งออกไฟล์ Excel
+            </button>
             <button type="button" class="btn btn-primary btn-small" onclick="printFilteredReports()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               พิมพ์รายการที่แสดงอยู่
@@ -1420,7 +1426,7 @@
   const pageInformation = {
     dashboard: { title: 'ภาพรวมระบบ', subtitle: 'สรุปสถิติและสถานะการจัดการความเสี่ยง' },
     'add-report': { title: 'เพิ่มรายงานความเสี่ยง', subtitle: 'บันทึกข้อมูลความเสี่ยงที่ตรวจพบในพื้นที่' },
-    reports: { title: 'รายการความเสี่ยง', subtitle: 'ค้นหา ดูรายละเอียด Before/After และพิมพ์รายงาน' },
+    reports: { title: 'รายการความเสี่ยง', subtitle: 'ค้นหา ดูรายละเอียด Before/After ส่งออก Excel และพิมพ์รายงาน' },
     corrections: { title: 'บันทึกผลการแก้ไข', subtitle: 'ตรวจสอบและบันทึกผลการแก้ไขความเสี่ยง' },
     history: { title: 'ประวัติการดำเนินงาน', subtitle: 'ติดตามประวัติการบันทึกและแก้ไขทั้งหมด' }
   };
@@ -1962,6 +1968,85 @@
         imageUrl: r.beforeImageUrl || ''
       });
     }
+  }
+
+  /* ===== Export to Excel (.CSV UTF-8 BOM) ===== */
+  function exportReportsToExcel() {
+    const targetList = (Array.isArray(filteredRiskReports) && filteredRiskReports.length > 0)
+      ? filteredRiskReports
+      : allRiskReports;
+
+    if (!targetList || targetList.length === 0) {
+      showToast('ไม่มีข้อมูลรายการความเสี่ยงให้ส่งออก', 'error');
+      return;
+    }
+
+    const headers = [
+      'รหัสรายงาน',
+      'วันและเวลาที่พบ',
+      'พื้นที่หลัก (Section)',
+      'พื้นที่ย่อย',
+      'ตำแหน่งที่พบความเสี่ยง',
+      'ประเภทอันตราย',
+      'สภาพการณ์ที่ไม่ปลอดภัย',
+      'อุบัติเหตุที่อาจเกิดขึ้น',
+      'แนวทางควบคุมระยะยาว',
+      'ผู้รายงาน',
+      'ผู้รับผิดชอบ',
+      'สถานะปัจจุบัน',
+      'วันและเวลาแก้ไข',
+      'ผู้ดำเนินการแก้ไข',
+      'รายละเอียดผลการแก้ไข',
+      'ผู้ตรวจสอบ (จป.)',
+      'ลิงก์ภาพก่อนแก้ไข',
+      'ลิงก์ภาพหลังแก้ไข'
+    ];
+
+    const escapeCsv = (val) => {
+      const str = String(val == null ? '' : val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = targetList.map(r => {
+      const corrections = Array.isArray(r.corrections) ? r.corrections : [];
+      const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : {};
+      return [
+        r.reportId || '',
+        r.reportDateTime || '',
+        r.section || '',
+        r.areaName || '',
+        r.locationDetail || '',
+        r.hazardCategory || '',
+        r.unsafeCondition || '',
+        r.potentialIncident || '',
+        r.longTermControl || '',
+        r.reporter || '',
+        r.supervisor || '',
+        r.status || '',
+        latestCorr.correctionDateTime || '',
+        latestCorr.correctedBy || '',
+        latestCorr.correctionDetail || '',
+        latestCorr.recordedBy || '',
+        r.beforeImageUrl || '',
+        latestCorr.afterImageUrl || ''
+      ].map(escapeCsv).join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const now = new Date();
+    const dateStamp = `${now.getFullYear() + 543}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SafeTrack_Report_${dateStamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    showToast(`ดาวน์โหลดไฟล์ Excel (${targetList.length} รายการ) สำเร็จ!`);
   }
 
   function openImageLightbox(imgSrc, captionText) {
