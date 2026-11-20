@@ -380,6 +380,71 @@
     .btn-excel { background: #1d6f42; color: #ffffff; }
     .btn-excel:hover { background: #155331; }
     .btn-small { padding: 9px 14px; font-size: 13px; border-radius: 8px; }
+
+    /* ===== Quick Guide Modal & Visual Illustrations ===== */
+    .btn-help-pill {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: var(--navy);
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: .15s;
+    }
+    .btn-help-pill:hover { border-color: var(--teal); color: var(--teal-dark); background: var(--teal-soft); }
+
+    .guide-step-list { display: grid; gap: 14px; margin: 14px 0 18px; }
+    .guide-step-card {
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 125px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+    .guide-visual-box {
+      width: 125px;
+      height: 86px;
+      border-radius: 9px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(15, 32, 53, 0.05);
+    }
+    .guide-visual-box img { width: 100%; height: 100%; object-fit: cover; }
+    .guide-step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .guide-step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .guide-step-title { font-weight: 800; color: var(--navy); font-size: 15px; }
+    .guide-step-desc { font-size: 13px; color: #475569; line-height: 1.45; }
+
+    @media (max-width: 540px) {
+      .guide-step-card { grid-template-columns: 1fr; }
+      .guide-visual-box { width: 100%; height: 105px; }
+    }
     .message {
       padding: 13px 16px;
       border-radius: 10px;
@@ -930,9 +995,14 @@
         <h1 class="page-title" id="pageTitle">ภาพรวมระบบ</h1>
         <div class="page-subtitle" id="pageSubtitle">ระบบจัดการและติดตามความเสี่ยงในการทำงาน</div>
       </div>
-      <div class="company-pill">
-        <span class="company-pill-dot"></span>
-        <span id="topbarCompanyName">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</span>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-help-pill" onclick="openUserGuideModal(true)">
+          <span>❓</span> วิธีใช้งานระบบ
+        </button>
+        <div class="company-pill">
+          <span class="company-pill-dot"></span>
+          <span id="topbarCompanyName">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</span>
+        </div>
       </div>
     </div>
 
@@ -1433,6 +1503,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     applyBrandConfig();
+    openUserGuideModal(false);
     setCurrentDateTime('reportDateTime');
     setCurrentDateTime('correctionDateTime');
 
@@ -2731,6 +2802,141 @@
         </div>
       `;
       list.appendChild(div);
+    });
+  }
+
+  /* ===== Quick User Guide Modal with Visuals ===== */
+  function openUserGuideModal(forceShow = false) {
+    const STORAGE_KEY = 'safetrack_guide_seen_v1';
+    if (!forceShow && localStorage.getItem(STORAGE_KEY) === 'true') {
+      return;
+    }
+
+    const existing = document.getElementById('userGuideBackdrop');
+    if (existing) existing.remove();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.id = 'userGuideBackdrop';
+
+    const closeGuide = () => {
+      const dontShowAgain = document.getElementById('dontShowGuideAgain');
+      if (dontShowAgain && dontShowAgain.checked) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+      }
+      backdrop.remove();
+    };
+
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeGuide();
+    });
+
+    const svgStep1 = `
+      <svg viewBox="0 0 140 96" width="100%" height="100%">
+        <rect width="140" height="96" fill="#eef6f6"/>
+        <rect x="18" y="12" width="104" height="72" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+        <rect x="28" y="22" width="52" height="7" rx="3.5" fill="#142b45"/>
+        <rect x="28" y="34" width="84" height="10" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+        <rect x="28" y="49" width="44" height="24" rx="5" fill="#e6f7f6" stroke="#0e9f9a" stroke-dasharray="3 2"/>
+        <circle cx="50" cy="61" r="6" fill="#0e9f9a"/>
+        <rect x="78" y="55" width="34" height="18" rx="5" fill="#0e9f9a"/>
+        <text x="95" y="67" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">บันทึก</text>
+      </svg>`;
+
+    const svgStep2 = `
+      <svg viewBox="0 0 140 96" width="100%" height="100%">
+        <rect width="140" height="96" fill="#eafaf0"/>
+        <rect x="20" y="14" width="100" height="68" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+        <rect x="30" y="24" width="68" height="24" rx="6" fill="#06c755"/>
+        <text x="64" y="39" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">LINE แจ้งเตือน</text>
+        <rect x="30" y="54" width="80" height="16" rx="5" fill="#fff7ed" stroke="#fdba74"/>
+        <text x="70" y="65" text-anchor="middle" font-size="8" font-weight="bold" fill="#c2410c">ส่งรูป + ข้อความ</text>
+      </svg>`;
+
+    const svgStep3 = `
+      <svg viewBox="0 0 140 96" width="100%" height="100%">
+        <rect width="140" height="96" fill="#f0f4f8"/>
+        <rect x="16" y="14" width="50" height="68" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+        <text x="41" y="30" text-anchor="middle" font-size="8" font-weight="bold" fill="#b91c1c">BEFORE</text>
+        <line x1="31" y1="42" x2="51" y2="62" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+        <line x1="51" y1="42" x2="31" y2="62" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+        <rect x="74" y="14" width="50" height="68" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="99" y="30" text-anchor="middle" font-size="8" font-weight="bold" fill="#15803d">AFTER</text>
+        <polyline points="89,52 96,60 110,44" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+
+    backdrop.innerHTML = `
+      <div class="modal-box" style="width: min(650px, 100%);">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <span style="font-size:22px;">🦺</span>
+            คู่มือการใช้งาน ${escapeHtml(BRAND_CONFIG.systemName)}
+          </h3>
+          <button type="button" class="modal-close" id="closeGuideXBtn" title="ปิดหน้าต่าง">×</button>
+        </div>
+
+        <div style="font-size:13.5px; color:#475569;">
+          ขั้นตอนการแจ้งและติดตามแก้ไขจุดเสี่ยง (<strong>${escapeHtml(BRAND_CONFIG.companyName)}</strong>) ง่ายๆ ใน 3 ขั้นตอน:
+        </div>
+
+        <div class="guide-step-list">
+          <div class="guide-step-card">
+            <div class="guide-visual-box" id="guideImgBox1">${svgStep1}</div>
+            <div>
+              <div class="guide-step-header">
+                <span class="guide-step-num">1</span>
+                <div class="guide-step-title">แจ้งจุดเสี่ยง (Add Report)</div>
+              </div>
+              <div class="guide-step-desc">กดเมนู <strong>"แจ้งความเสี่ยง"</strong> (หรือปุ่ม + มุมขวาล่างบนมือถือ) กรอกรายละเอียดพื้นที่และถ่ายรูปจุดเสี่ยง ระบบจะย่อขนาดภาพให้อัตโนมัติ</div>
+            </div>
+          </div>
+
+          <div class="guide-step-card">
+            <div class="guide-visual-box" id="guideImgBox2">${svgStep2}</div>
+            <div>
+              <div class="guide-step-header">
+                <span class="guide-step-num">2</span>
+                <div class="guide-step-title">แชร์แจ้งเตือนเข้ากลุ่ม LINE</div>
+              </div>
+              <div class="guide-step-desc">หลังบันทึกสำเร็จ กดปุ่ม <strong>"ส่งรูปภาพ + คัดลอกข้อความเข้า LINE"</strong> เพื่อแจ้งเตือนผู้รับผิดชอบในกลุ่มไลน์ทันที</div>
+            </div>
+          </div>
+
+          <div class="guide-step-card">
+            <div class="guide-visual-box" id="guideImgBox3">${svgStep3}</div>
+            <div>
+              <div class="guide-step-header">
+                <span class="guide-step-num">3</span>
+                <div class="guide-step-title">ตรวจสอบและปิดงาน (Before / After)</div>
+              </div>
+              <div class="guide-step-desc">เมื่อแก้ไขจุดเสี่ยงเรียบร้อย ให้เข้าเมนู <strong>"บันทึกผลแก้ไข"</strong> เลือกรายการเดิม แนบภาพหลังแก้ไข เพื่อปิดงานและอัปเดตสถิติบน Dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:14px;">
+          <label style="font-size:13px; font-weight:600; color:#64768a; cursor:pointer;">
+            <input type="checkbox" id="dontShowGuideAgain" checked style="width:16px; height:16px; accent-color:var(--teal);">
+            ไม่ต้องแสดงอัตโนมัติอีกในครั้งถัดไป
+          </label>
+          <button type="button" class="btn btn-primary" id="confirmGuideBtn">เข้าใจแล้ว เริ่มใช้งาน</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+    document.getElementById('closeGuideXBtn').addEventListener('click', closeGuide);
+    document.getElementById('confirmGuideBtn').addEventListener('click', closeGuide);
+
+    ['guide1.png', 'guide2.png', 'guide3.png'].forEach((fileName, idx) => {
+      const testImg = new Image();
+      testImg.onload = () => {
+        const box = document.getElementById('guideImgBox' + (idx + 1));
+        if (box) {
+          box.innerHTML = `<img src="${fileName}" alt="ขั้นตอนที่ ${idx + 1}" style="cursor:zoom-in;" onclick="openImageLightbox('${fileName}', 'ภาพตัวอย่างขั้นตอนที่ ${idx + 1}')">`;
+        }
+      };
+      testImg.src = fileName;
     });
   }
 
