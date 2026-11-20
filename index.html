@@ -516,7 +516,50 @@
     .filter-group label { font-size: 12px; color: #526579; }
     .report-result-count { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
 
-    /* ===== Dashboard & Overdue Alert ===== */
+    /* ===== Dashboard Toolbar, Filter & Overdue Alert ===== */
+    .dashboard-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 10px rgba(17, 36, 56, 0.04);
+    }
+
+    .dashboard-filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-filter-wrap label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    .dashboard-month-select {
+      width: auto !important;
+      min-width: 215px;
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      font-weight: 700;
+      color: var(--navy);
+      background: #f8fafc !important;
+      border: 1.5px solid #cbd5e1 !important;
+      border-radius: 9px !important;
+      cursor: pointer;
+    }
+
+    .dashboard-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
     .overdue-banner {
       background: linear-gradient(135deg, #fff8eb 0%, #fff1d6 100%);
       border: 1.5px solid #f6c87a;
@@ -533,7 +576,6 @@
     .overdue-title { font-size: 14px; font-weight: 800; color: #9a5306; display: flex; align-items: center; gap: 7px; }
     .overdue-desc { font-size: 13px; color: #7c470b; margin-top: 2px; }
 
-    .dashboard-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
 
     .stat-card {
@@ -785,6 +827,12 @@
       .page-title { font-size: 20px; }
       .company-pill { display: none; }
 
+      .dashboard-toolbar { flex-direction: column; align-items: stretch; }
+      .dashboard-filter-wrap { width: 100%; }
+      .dashboard-month-select { width: 100% !important; }
+      .dashboard-actions { width: 100%; }
+      .dashboard-actions .btn { flex: 1; }
+
       .card { padding: 16px; border-radius: 12px; }
       .form-grid, .detail-grid, .ba-image-grid, .dashboard-chart-grid, .dashboard-table-grid { grid-template-columns: 1fr; }
       .dashboard-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -886,15 +934,27 @@
     </div>
 
     <section class="section active" id="page-dashboard">
-      <div class="dashboard-actions">
-        <button type="button" class="btn btn-secondary btn-small" id="refreshDashboardBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          โหลดข้อมูลใหม่
-        </button>
-        <button type="button" class="btn btn-primary btn-small" id="printDashboardBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          พิมพ์สรุป Dashboard
-        </button>
+      <div class="dashboard-toolbar">
+        <div class="dashboard-filter-wrap">
+          <label for="dashboardMonthFilter">
+            <span class="label-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+            ช่วงเวลาแสดงผล:
+          </label>
+          <select id="dashboardMonthFilter" class="dashboard-month-select">
+            <option value="ALL">📊 ภาพรวมทั้งหมด (สะสม)</option>
+          </select>
+        </div>
+
+        <div class="dashboard-actions">
+          <button type="button" class="btn btn-secondary btn-small" id="refreshDashboardBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            โหลดข้อมูลใหม่
+          </button>
+          <button type="button" class="btn btn-primary btn-small" id="printDashboardBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            พิมพ์สรุป Dashboard
+          </button>
+        </div>
       </div>
 
       <div id="dashboardMessage" class="message"></div>
@@ -909,7 +969,7 @@
             </div>
           </div>
           <div class="stat-value" id="totalReports">-</div>
-          <div class="stat-note">จำนวนรายงานในระบบ</div>
+          <div class="stat-note" id="totalReportsNote">จำนวนรายงานในระบบ</div>
         </div>
 
         <div class="stat-card pending">
@@ -936,13 +996,13 @@
 
         <div class="stat-card areas">
           <div class="stat-top">
-            <div class="stat-label">พื้นที่ที่ใช้งาน</div>
+            <div class="stat-label" id="activeAreasLabel">พื้นที่ที่ใช้งาน</div>
             <div class="stat-icon-badge">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             </div>
           </div>
           <div class="stat-value" id="activeAreas">-</div>
-          <div class="stat-note">พื้นที่เปิดใช้งาน</div>
+          <div class="stat-note" id="activeAreasNote">พื้นที่เปิดใช้งาน</div>
         </div>
       </div>
 
@@ -965,7 +1025,7 @@
         </div>
         <div class="card chart-wide">
           <h2 class="card-title">แนวโน้มรายงานความเสี่ยงรายเดือน</h2>
-          <div class="card-description">สถิติย้อนหลัง 6 เดือนล่าสุด</div>
+          <div class="card-description">สถิติเปรียบเทียบรายเดือนย้อนหลัง 6 เดือนล่าสุด</div>
           <div id="monthlyTrendChart"><div class="skeleton-box"></div></div>
         </div>
       </div>
@@ -982,7 +1042,7 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title">รายการความเสี่ยงล่าสุด 10 รายการ</h2>
+        <h2 class="card-title" id="dashboardLatestTitle">รายการความเสี่ยงล่าสุด 10 รายการ</h2>
         <div id="dashboardLatestTable" class="table-responsive"><div class="skeleton-box"></div></div>
       </div>
     </section>
@@ -1359,6 +1419,7 @@
   let currentReportForPrint = null;
   let selectedCorrectionReport = null;
   let allHistoryData = [];
+  let dashboardSummaryCache = {};
   let compressedImages = { beforeImage: null, afterImage: null };
 
   const pageInformation = {
@@ -1381,6 +1442,7 @@
     loadMasterData();
     loadFullSystemData();
 
+    document.getElementById('dashboardMonthFilter').addEventListener('change', applyDashboardPeriodFilter);
     document.getElementById('refreshDashboardBtn').addEventListener('click', () => loadFullSystemData(true));
     document.getElementById('printDashboardBtn').addEventListener('click', printDashboard);
     document.getElementById('refreshReportsBtn').addEventListener('click', () => loadFullSystemData(true));
@@ -1574,18 +1636,15 @@
       }
 
       allRiskReports = Array.isArray(res.reports) ? res.reports : [];
-      const summary = res.summary || {};
+      dashboardSummaryCache = res.summary || {};
 
-      const pendingCount = Number(summary.pendingReports || 0);
+      const pendingCount = Number(dashboardSummaryCache.pendingReports || 0);
       const badge = document.getElementById('pendingNavBadge');
       badge.textContent = pendingCount;
       badge.classList.toggle('show', pendingCount > 0);
 
-      document.getElementById('totalReports').textContent = Number(summary.totalReports || 0).toLocaleString('th-TH');
-      document.getElementById('pendingReports').textContent = pendingCount.toLocaleString('th-TH');
-      document.getElementById('completedReports').textContent = Number(summary.completedReports || 0).toLocaleString('th-TH');
-      document.getElementById('activeAreas').textContent = Number(summary.activeAreas || 0).toLocaleString('th-TH');
-      renderDashboardAnalytics(allRiskReports);
+      populateDashboardMonthFilter(allRiskReports);
+      applyDashboardPeriodFilter();
 
       populateReportAreaFilter();
       filterRiskReports();
@@ -1599,6 +1658,87 @@
       showBoxMessage('dashboardMessage', msg, 'error');
       showBoxMessage('reportsMessage', msg, 'error');
     });
+  }
+
+  function getMonthKeyFromDate(d) {
+    if (!d) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function populateDashboardMonthFilter(reports) {
+    const select = document.getElementById('dashboardMonthFilter');
+    if (!select) return;
+    const prevValue = select.value || 'ALL';
+
+    const monthMap = new Map();
+    reports.forEach(r => {
+      const d = parseThaiDate(r.reportDateTime);
+      if (d) {
+        const key = getMonthKeyFromDate(d);
+        if (!monthMap.has(key)) {
+          const label = d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+          monthMap.set(key, { key, label, count: 0 });
+        }
+        monthMap.get(key).count++;
+      }
+    });
+
+    const sortedMonths = Array.from(monthMap.values()).sort((a, b) => b.key.localeCompare(a.key));
+
+    select.innerHTML = `<option value="ALL">📊 ภาพรวมทั้งหมด (สะสม ${reports.length} รายการ)</option>`;
+    sortedMonths.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.key;
+      opt.textContent = `📅 เดือน ${m.label} (${m.count} รายการ)`;
+      select.appendChild(opt);
+    });
+
+    if (prevValue === 'ALL' || monthMap.has(prevValue)) {
+      select.value = prevValue;
+    } else {
+      select.value = 'ALL';
+    }
+  }
+
+  function applyDashboardPeriodFilter() {
+    const select = document.getElementById('dashboardMonthFilter');
+    const selectedMonth = select ? select.value : 'ALL';
+
+    let targetReports = allRiskReports;
+    let isAllPeriod = (selectedMonth === 'ALL');
+
+    if (!isAllPeriod) {
+      targetReports = allRiskReports.filter(r => {
+        const d = parseThaiDate(r.reportDateTime);
+        return d && getMonthKeyFromDate(d) === selectedMonth;
+      });
+    }
+
+    const total = targetReports.length;
+    const completed = targetReports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
+    const pending = total - completed;
+
+    document.getElementById('totalReports').textContent = total.toLocaleString('th-TH');
+    document.getElementById('pendingReports').textContent = pending.toLocaleString('th-TH');
+    document.getElementById('completedReports').textContent = completed.toLocaleString('th-TH');
+
+    if (isAllPeriod) {
+      document.getElementById('totalReportsNote').textContent = 'จำนวนรายงานสะสมทั้งหมด';
+      document.getElementById('activeAreasLabel').textContent = 'พื้นที่ที่ใช้งาน';
+      document.getElementById('activeAreasNote').textContent = 'พื้นที่เปิดใช้งานในระบบ';
+      document.getElementById('activeAreas').textContent = Number(dashboardSummaryCache.activeAreas || 0).toLocaleString('th-TH');
+      document.getElementById('dashboardLatestTitle').textContent = 'รายการความเสี่ยงล่าสุด 10 รายการ';
+    } else {
+      const selectedOptionText = select.options[select.selectedIndex].text.replace(/^📅\s*/, '').replace(/\s*\(\d+.*\)$/, '');
+      const distinctAreas = new Set(targetReports.map(r => [r.section, r.areaName].filter(Boolean).join('/')).filter(Boolean)).size;
+      document.getElementById('totalReportsNote').textContent = `รายงานใน${selectedOptionText}`;
+      document.getElementById('activeAreasLabel').textContent = 'พื้นที่ที่พบความเสี่ยง';
+      document.getElementById('activeAreasNote').textContent = `พบจุดเสี่ยงใน${selectedOptionText}`;
+      document.getElementById('activeAreas').textContent = distinctAreas.toLocaleString('th-TH');
+      document.getElementById('dashboardLatestTitle').textContent = `รายการความเสี่ยงใน${selectedOptionText} (${total} รายการ)`;
+    }
+
+    renderDashboardAnalytics(targetReports, allRiskReports);
   }
 
   function setupImageCompression(inputId, wrapId, previewId, hintId) {
@@ -2281,7 +2421,7 @@
 
   const chartColors = ['#0e9f9a','#e6a23c','#5279b8','#239b75','#9b72b0','#d66b6b','#6b9aab','#8c9b52'];
 
-  function renderDashboardAnalytics(reports) {
+  function renderDashboardAnalytics(reports, allReportsForTrend = null) {
     const completed = reports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
     const pending = reports.length - completed;
 
@@ -2313,7 +2453,7 @@
 
     const statusEl = document.getElementById('statusOverview');
     statusEl.innerHTML = reports.length === 0
-      ? '<div class="empty-state">ยังไม่มีรายงานความเสี่ยงในระบบ</div>'
+      ? '<div class="empty-state">ยังไม่มีรายงานความเสี่ยงในช่วงเวลาที่เลือก</div>'
       : `<div class="donut-wrap">
         ${buildDonutSvg([pending, completed], ['#e6a23c', '#239b75'], reports.length, 'ทั้งหมด')}
         <div class="chart-legend">
@@ -2351,7 +2491,7 @@
       `).join('')}</div>`;
     }
 
-    renderMonthlyTrend(reports);
+    renderMonthlyTrend(allReportsForTrend || reports);
 
     document.getElementById('areaSummaryTable').innerHTML = areaGroups.length ? `
       <table class="dashboard-data-table"><thead><tr><th>พื้นที่</th><th class="num">ทั้งหมด</th><th class="num">รอแก้ไข</th><th class="num">แก้ไขแล้ว</th></tr></thead>
@@ -2425,21 +2565,21 @@
   }
 
   function printDashboard() {
-    const clone = document.getElementById('page-dashboard').cloneNode(true);
-    clone.querySelectorAll('.dashboard-actions, #dashboardMessage, .stat-icon-badge, #overdueAlertContainer').forEach(el => el.remove());
-    const printWin = window.open('', '_blank');
-    if (!printWin) return alert('กรุณาอนุญาต Pop-up เพื่อสั่งพิมพ์');
+    const select = document.getElementById('dashboardMonthFilter');
+    const periodLabel = select
+      ? select.options[select.selectedIndex].text.replace(/^[📊📅]\s*/, '')
+      : 'ภาพรวมทั้งหมด';
 
-    printWin.document.open();
-    printWin.document.write(`
-      <!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><title>Dashboard ${escapeHtml(BRAND_CONFIG.systemName)}</title>
-      <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+    const clone = document.getElementById('page-dashboard').cloneNode(true);
+    clone.querySelectorAll('.dashboard-toolbar, .dashboard-actions, #dashboardMessage, .stat-icon-badge, #overdueAlertContainer').forEach(el => el.remove());
+
+    const bodyHtml = `
+      <div style="border-bottom: 2px solid #0e9f9a; padding-bottom: 6px; margin-bottom: 12px;">
+        <div style="font-weight:700; color:#475569;">${escapeHtml(BRAND_CONFIG.companyName)}</div>
+        <h1 style="font-size: 16pt; color: #142b45; margin: 2px 0;">สรุปภาพรวมความปลอดภัยในการทำงาน (${escapeHtml(BRAND_CONFIG.systemName)})</h1>
+        <div style="font-weight:700; color:#087d79;">ช่วงเวลาข้อมูล: ${escapeHtml(periodLabel)}</div>
+      </div>
       <style>
-        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        body { font-family: 'Sarabun', sans-serif; color: #1f2937; margin: 0; font-size: 9.5pt; }
-        @page { size: A4 portrait; margin: 10mm; }
-        h1 { font-size: 16pt; color: #142b45; margin: 0 0 4px; }
-        .head { border-bottom: 2px solid #0e9f9a; padding-bottom: 6px; margin-bottom: 12px; }
         .dashboard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
         .stat-card, .card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; margin-bottom: 10px; break-inside: avoid; }
         .stat-value { font-size: 18pt; font-weight: 800; }
@@ -2447,22 +2587,16 @@
         .chart-wide { grid-column: 1 / -1; }
         .card-title { font-size: 11pt; margin: 0 0 6px; color: #142b45; }
         .card-description { display: none; }
-        table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
-        th, td { border: 1px solid #cbd5e1; padding: 4px 6px; text-align: left; }
-        th { background: #f1f5f9; }
         .donut-svg { width: 105px; height: 105px; flex-basis: 105px; }
-      </style></head>
-      <body>
-        <div class="head">
-          <div style="font-weight:700; color:#475569;">${escapeHtml(BRAND_CONFIG.companyName)}</div>
-          <h1>สรุปภาพรวมความปลอดภัยในการทำงาน (${escapeHtml(BRAND_CONFIG.systemName)})</h1>
-          <div>พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div>
-        </div>
-        ${clone.innerHTML}
-      </body></html>
-    `);
-    printWin.document.close();
-    setTimeout(() => { printWin.focus(); printWin.print(); }, 350);
+        .donut-wrap { display: flex; align-items: center; gap: 14px; }
+        .bar-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; align-items: center; font-size: 8.5pt; margin-bottom: 4px; }
+        .bar-track { height: 8px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; }
+      </style>
+      ${clone.innerHTML}
+    `;
+
+    executePrintWindow('สรุปภาพรวม SafeTrack - ' + periodLabel, bodyHtml);
   }
 
   function loadActivityHistory(notify = false) {
