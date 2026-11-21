@@ -1425,12 +1425,53 @@ function openUserGuideModal(forceShow = false) {
     };
     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeGuide(); });
 
-    const svgStep1 = `<svg viewBox="0 0 180 115" width="100%" height="100%"><rect x="8" y="8" width="164" height="99" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/><rect x="8" y="8" width="164" height="18" rx="8" fill="#0e9f9a"/><circle cx="20" cy="17" r="3" fill="#ffffff"/><rect x="28" y="15" width="45" height="4" rx="2" fill="#ffffff" opacity="0.9"/><rect x="18" y="34" width="68" height="12" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/><rect x="94" y="34" width="68" height="12" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/><rect x="18" y="52" width="144" height="18" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/><rect x="18" y="76" width="52" height="22" rx="4" fill="#e6f7f6" stroke="#0e9f9a" stroke-dasharray="2 2"/><circle cx="44" cy="85" r="4" fill="#0e9f9a"/><rect x="108" y="80" width="54" height="16" rx="5" fill="#0e9f9a"/><rect x="118" y="86" width="34" height="4" rx="2" fill="#ffffff"/></svg>`;
+const svgStep1 = `
+      <svg viewBox="0 0 180 115" width="100%" height="100%" font-family="Prompt, sans-serif">
+        <rect x="8" y="8" width="164" height="99" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+        <path d="M8 16 Q8 8 16 8 L164 8 Q172 8 172 16 L172 28 L8 28 Z" fill="#0e9f9a"/>
+        <circle cx="19" cy="18" r="3" fill="#ffffff" opacity="0.9"/>
+        <text x="27" y="21" font-size="8.5" font-weight="700" fill="#ffffff">แบบแจ้งความเสี่ยง</text>
+        <rect x="16" y="34" width="70" height="13" rx="3" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="21" y="43" font-size="6.5" fill="#64748b">พื้นที่ / ตำแหน่ง</text>
+        <rect x="92" y="34" width="72" height="13" rx="3" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="97" y="43" font-size="6.5" fill="#64748b">ประเภทอันตราย</text>
+        <rect x="16" y="52" width="148" height="16" rx="3" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="21" y="62.5" font-size="6.5" fill="#64748b">รายละเอียดสภาพไม่ปลอดภัย...</text>
+        <rect x="16" y="74" width="84" height="24" rx="4" fill="#e6f7f6" stroke="#0e9f9a" stroke-dasharray="2.5 2"/>
+        <text x="58" y="85" text-anchor="middle" font-size="7" font-weight="600" fill="#087d79">📷 ถ่ายรูปจุดเสี่ยง</text>
+        <text x="58" y="94" text-anchor="middle" font-size="6" fill="#0e9f9a">(สูงสุด 6 รูป)</text>
+        <rect x="108" y="77" width="56" height="20" rx="5" fill="#0e9f9a"/>
+        <text x="136" y="90" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">บันทึก</text>
+      </svg>`;
 
-    const svgStep2 = `<svg viewBox="0 0 180 115" width="100%" height="100%"><rect x="12" y="10" width="156" height="95" rx="10" fill="#e8f5e9" stroke="#a7f3d0" stroke-width="1.5"/><rect x="24" y="20" width="118" height="44" rx="8" fill="#ffffff" stroke="#cbd5e1"/><rect x="32" y="27" width="44" height="5" rx="2.5" fill="#f59e0b"/><rect x="32" y="36" width="96" height="4" rx="2" fill="#64748b"/><rect x="32" y="44" width="78" height="4" rx="2" fill="#94a3b8"/><rect x="32" y="52" width="60" height="4" rx="2" fill="#94a3b8"/><rect x="36" y="72" width="120" height="24" rx="12" fill="#06c755"/><circle cx="52" cy="84" r="6" fill="#ffffff"/><rect x="64" y="82" width="76" height="4" rx="2" fill="#ffffff"/></svg>`;
+    const svgStep2 = `
+      <svg viewBox="0 0 180 115" width="100%" height="100%" font-family="Prompt, sans-serif">
+        <rect x="10" y="8" width="160" height="99" rx="10" fill="#e8f5e9" stroke="#a7f3d0" stroke-width="1.5"/>
+        <rect x="20" y="16" width="128" height="52" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="28" y="28" font-size="7.5" font-weight="700" fill="#d97706">⚠️ แจ้งพบความเสี่ยง</text>
+        <text x="28" y="39" font-size="6.5" fill="#475569">รหัส: RSK-xxxx | พื้นที่ปฏิบัติงาน</text>
+        <text x="28" y="49" font-size="6.5" fill="#64748b">สภาพไม่ปลอดภัย + รูปภาพแนบ</text>
+        <text x="28" y="59" font-size="6" fill="#0e9f9a">คัดลอกข้อความให้อัตโนมัติ ✓</text>
+        <rect x="24" y="75" width="132" height="24" rx="12" fill="#06c755"/>
+        <text x="90" y="90" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">💬 ส่งเข้ากลุ่ม LINE</text>
+      </svg>`;
 
-    const svgStep3 = `<svg viewBox="0 0 180 115" width="100%" height="100%"><rect x="10" y="10" width="75" height="95" rx="8" fill="#fff5f5" stroke="#fecaca" stroke-width="1.5"/><rect x="26" y="18" width="43" height="12" rx="6" fill="#fee2e2"/><rect x="35" y="22" width="25" height="4" rx="2" fill="#dc2626"/><path d="M36 48 L59 71 M59 48 L36 71" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/><rect x="22" y="84" width="51" height="5" rx="2.5" fill="#fca5a5"/><rect x="95" y="10" width="75" height="95" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/><rect x="111" y="18" width="43" height="12" rx="6" fill="#dcfce7"/><rect x="120" y="22" width="25" height="4" rx="2" fill="#16a34a"/><path d="M121 60 L130 69 L146 51" fill="none" stroke="#22c55e" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="107" y="84" width="51" height="5" rx="2.5" fill="#86efac"/></svg>`;
+    const svgStep3 = `
+      <svg viewBox="0 0 180 115" width="100%" height="100%" font-family="Prompt, sans-serif">
+        <rect x="10" y="8" width="76" height="99" rx="8" fill="#fff5f5" stroke="#fecaca" stroke-width="1.5"/>
+        <rect x="21" y="15" width="54" height="14" rx="7" fill="#fee2e2"/>
+        <text x="48" y="24.5" text-anchor="middle" font-size="7" font-weight="700" fill="#b91c1c">ก่อนแก้ไข</text>
+        <path d="M38 44 L58 64 M58 44 L38 64" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="48" y="80" text-anchor="middle" font-size="7" font-weight="600" fill="#dc2626">พบจุดเสี่ยง</text>
+        <text x="48" y="91" text-anchor="middle" font-size="6" fill="#ef4444">(Before)</text>
 
+        <rect x="94" y="8" width="76" height="99" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+        <rect x="105" y="15" width="54" height="14" rx="7" fill="#dcfce7"/>
+        <text x="132" y="24.5" text-anchor="middle" font-size="7" font-weight="700" fill="#15803d">หลังแก้ไข</text>
+        <path d="M121 55 L129 63 L144 46" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="132" y="80" text-anchor="middle" font-size="7" font-weight="600" fill="#16a34a">ปิดงานเรียบร้อย</text>
+        <text x="132" y="91" text-anchor="middle" font-size="6" fill="#22c55e">(After)</text>
+      </svg>`;
     backdrop.innerHTML = `
       <div class="modal-box" style="width: min(650px, 100%);">
         <div class="modal-header">
