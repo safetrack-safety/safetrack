@@ -3,447 +3,652 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SafeTrack | ระบบจัดการความปลอดภัยในการทำงาน</title>
+  <title>SafeTrack | ระบบรายงานความเสี่ยง</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --navy: #142b45;
-      --navy-dark: #0f2136;
+      --navy-light: #1d3b5c;
       --teal: #0e9f9a;
       --teal-dark: #087d79;
-      --teal-soft: #e6f7f6;
-      --bg: #f1f5f8;
-      --card: #ffffff;
-      --text: #1b2a3c;
-      --muted: #64768a;
-      --border: #dde5ed;
-      --shadow: 0 4px 16px rgba(20, 43, 69, 0.06);
+      --teal-soft: #eaf6f5;
+      --bg: #f3f6fa;
+      --white: #ffffff;
+      --text: #243447;
+      --muted: #6e7f91;
+      --border: #dfe6ed;
+      --danger: #dc5555;
+      --warning: #e6a23c;
+      --success: #239b75;
+      --line-green: #06c755;
+      --shadow: 0 4px 18px rgba(20, 43, 69, 0.06);
       --radius: 14px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; font-family: 'Sarabun', sans-serif; color: var(--text); background: var(--bg); line-height: 1.5; overflow-x: hidden; }
-    h1, h2, h3, .brand-name, .mobile-app-name, .stat-value, .nav-item, .btn { font-family: 'Prompt', 'Sarabun', sans-serif; }
-    .app { display: flex; min-height: 100vh; }
 
-    .sidebar { width: 268px; background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%); color: #fff; padding: 20px 14px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; flex-shrink: 0; z-index: 100; }
-    .brand { display: flex; align-items: center; gap: 12px; padding: 8px 8px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); margin-bottom: 18px; }
-    .brand-logo-wrap { width: 48px; height: 48px; border-radius: 12px; background: #ffffff; padding: 4px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); flex-shrink: 0; overflow: hidden; }
-    .brand-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
-    .brand-info { min-width: 0; }
-    .brand-name { font-size: 20px; font-weight: 800; line-height: 1.15; letter-spacing: 0.2px; }
-    .brand-company { font-size: 11px; color: #fbbf24; font-weight: 700; margin-top: 3px; line-height: 1.25; }
+    body {
+      margin: 0;
+      font-family: 'Sarabun', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.5;
+    }
 
-    .nav-label { font-size: 11px; color: #7e97b2; font-weight: 700; padding: 0 12px; margin-bottom: 8px; letter-spacing: 0.8px; }
-    .nav-menu { display: flex; flex-direction: column; gap: 6px; }
-    .nav-item { width: 100%; border: 0; background: transparent; color: #d5e0ec; padding: 12px 14px; border-radius: 11px; text-align: left; font-size: 14.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 11px; transition: 0.18s; position: relative; }
-    .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-    .nav-item.active { background: var(--teal); color: #fff; box-shadow: 0 4px 12px rgba(14, 159, 154, 0.35); }
-    .nav-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .nav-badge { margin-left: auto; background: #e74c3c; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; display: none; }
+    h1, h2, h3, .brand-name, .stat-value { font-family: 'Prompt', 'Sarabun', sans-serif; }
+    button, input, select, textarea { font: inherit; }
+
+    .app { min-height: 100vh; display: flex; }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: 255px;
+      min-width: 255px;
+      background: var(--navy);
+      color: white;
+      min-height: 100vh;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 10px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      margin-bottom: 22px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--teal);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .brand-name { font-size: 21px; font-weight: 800; letter-spacing: .3px; }
+    .brand-sub { font-size: 11px; color: #b6c6d6; }
+
+    .nav-label {
+      color: #8fa5bc;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0 12px;
+      margin: 0 0 10px;
+    }
+
+    .nav-menu { display: flex; flex-direction: column; gap: 4px; }
+
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 0;
+      background: transparent;
+      color: #c8d5e2;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: .18s;
+      position: relative;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,.08); color: white; }
+    .nav-item.active { background: var(--teal); color: white; font-weight: 700; }
+    .nav-icon { width: 22px; text-align: center; font-size: 18px; flex-shrink: 0; }
+    .nav-text { flex: 1; }
+
+    .nav-badge {
+      background: var(--warning);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 20px;
+      min-width: 22px;
+      text-align: center;
+      display: none;
+    }
     .nav-badge.show { display: inline-block; }
-    .sidebar-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.12); color: #9db0c4; font-size: 12px; line-height: 1.5; }
-    .sidebar-footer strong { color: #fbbf24; font-weight: 700; }
 
-    .mobile-header, .fab-add { display: none; }
-    .main { flex: 1; padding: 24px 28px; min-width: 0; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .page-title { font-size: 23px; font-weight: 800; color: var(--navy); margin: 0; }
-    .page-subtitle { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
-    .company-pill { display: inline-flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--border); padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: var(--navy); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03); }
-    .company-pill-dot { width: 8px; height: 8px; border-radius: 50%; background: #f39200; }
-    .btn-help-pill { display: inline-flex; align-items: center; gap: 6px; background: #ffffff; border: 1.5px solid #cbd5e1; color: var(--navy); padding: 6px 13px; border-radius: 999px; font-family: 'Prompt', 'Sarabun', sans-serif; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.15s; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03); }
-    .btn-help-pill:hover { border-color: var(--teal); color: var(--teal-dark); background: var(--teal-soft); }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 10px 0;
+      border-top: 1px solid rgba(255,255,255,.12);
+      color: #aebfd0;
+      font-size: 12px;
+      line-height: 1.6;
+    }
 
-    .section { display: none; animation: fadeIn 0.22s ease; }
-    .section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 18px; }
-    .card-header-flex { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .card-header-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--teal-soft); color: var(--teal-dark); display: grid; place-items: center; flex-shrink: 0; }
-    .card-title { font-size: 17px; font-weight: 700; color: var(--navy); margin: 0; }
-    .card-description { font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+    /* ================= MAIN CONTENT ================= */
+    .main { flex: 1; min-width: 0; padding: 28px; max-width: 1320px; }
+    .mobile-header { display: none; }
 
-    .dashboard-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
-    .dashboard-filter-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .dashboard-filter-wrap label { margin: 0; font-size: 13.5px; color: var(--navy); white-space: nowrap; }
-    .dashboard-month-select { min-height: 40px !important; padding: 7px 14px !important; font-size: 14px !important; font-weight: 700; color: var(--navy); background: #f8fafc; border-color: #cbd5e1; min-width: 245px; }
-    .dashboard-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .stat-card { background: var(--card); border: 1px solid var(--border); border-left: 5px solid var(--teal); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
-    .stat-card.pending { border-left-color: #e6a23c; }
-    .stat-card.completed { border-left-color: #239b75; }
-    .stat-card.areas { border-left-color: #5279b8; }
-    .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-    .stat-label { font-size: 13px; color: var(--muted); font-weight: 700; }
-    .stat-icon-badge { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--teal-soft); color: var(--teal-dark); }
-    .stat-card.pending .stat-icon-badge { background: #fef5e7; color: #b9770e; }
-    .stat-card.completed .stat-icon-badge { background: #e8f8f5; color: #196f52; }
-    .stat-card.areas .stat-icon-badge { background: #ebf2fa; color: #365990; }
-    .stat-value { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1.15; }
-    .stat-note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
 
-    .overdue-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fff8eb; border: 1px solid #f7d9a8; border-left: 5px solid #e67e22; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 18px; }
-    .overdue-title { font-weight: 700; color: #9c4a08; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
-    .overdue-desc { font-size: 13px; color: #7e4b1e; margin-top: 2px; }
+    .page-title { font-size: 24px; font-weight: 800; color: var(--navy); margin: 0; }
+    .page-subtitle { color: var(--muted); font-size: 13px; margin-top: 3px; }
 
-    .dashboard-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
-    .chart-wide { grid-column: 1 / -1; }
-    .donut-wrap { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-    .donut-svg { width: 150px; height: 150px; flex: 0 0 150px; }
-    .chart-legend { flex: 1; min-width: 190px; display: flex; flex-direction: column; gap: 9px; }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
-    .legend-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
-    .legend-value { margin-left: auto; font-weight: 700; color: var(--navy); }
-    .bar-list { display: flex; flex-direction: column; gap: 11px; }
-    .bar-row { display: grid; grid-template-columns: minmax(110px, 165px) 1fr 48px; gap: 10px; align-items: center; font-size: 13px; }
-    .bar-track { height: 11px; background: #edf1f5; border-radius: 999px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
-    .bar-value { text-align: right; font-weight: 700; color: var(--navy); }
-    .trend-svg { width: 100%; height: 210px; display: block; }
-    .dashboard-table-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .dashboard-data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 420px; }
-    .dashboard-data-table th, .dashboard-data-table td { padding: 10px 8px; border-bottom: 1px solid #e7edf3; text-align: left; }
-    .dashboard-data-table th { color: #56687a; font-weight: 700; background: #f8fafc; white-space: nowrap; }
-    .dashboard-data-table th.num, .dashboard-data-table td.num { text-align: right; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .system-label {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 7px 14px;
+      color: var(--teal-dark);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn .2s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================= CARDS & FORMS ================= */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .card-title { font-size: 17px; font-weight: 800; color: var(--navy); margin: 0 0 4px; }
+    .card-description { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 
     .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .form-group { display: flex; flex-direction: column; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
     .form-group.full { grid-column: 1 / -1; }
-    label { font-size: 13.5px; font-weight: 700; margin-bottom: 6px; color: #2b3a4a; display: inline-flex; align-items: center; gap: 6px; }
-    .label-icon { color: var(--teal-dark); display: inline-flex; }
-    .required { color: #d64545; margin-left: 2px; }
-    input, select, textarea { width: 100%; padding: 11px 13px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-family: inherit; color: var(--text); background: #fff; min-height: 45px; transition: border-color 0.15s, box-shadow 0.15s; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14, 159, 154, 0.15); }
+
+    label { font-size: 13.5px; font-weight: 700; color: #36495d; }
+    .required { color: var(--danger); margin-left: 3px; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1.5px solid #d5dfe9;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: .18s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(14,159,154,.12);
+    }
+
     textarea { min-height: 92px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); }
 
-    .upload-box { border: 2px dashed #b9c6d4; border-radius: 12px; padding: 16px; background: #f8fbfd; text-align: center; transition: 0.2s; }
-    .upload-box:hover { border-color: var(--teal); background: #f2fafa; }
-    .upload-btn-label { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--navy); color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 6px; }
-    input[type="file"] { display: none; }
-    .hint { font-size: 12.5px; color: var(--muted); }
-    .image-preview-wrap { margin-top: 12px; display: none; }
-    .image-preview { max-width: 100%; max-height: 230px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); }
-    .multi-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; text-align: left; }
-    .multi-preview-item { position: relative; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .multi-preview-item img { width: 100%; height: 105px; object-fit: cover; display: block; cursor: zoom-in; }
-    .multi-remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.92); color: #fff; border: 0; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 2px 8px; cursor: pointer; }
+    /* MULTI-IMAGE UPLOAD */
+    .upload-box {
+      border: 2px dashed #b9cad9;
+      border-radius: 12px;
+      padding: 18px;
+      background: #f8fbfd;
+      text-align: center;
+      transition: .2s;
+    }
 
-    .button-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
-    .btn { border: 0; border-radius: 10px; padding: 11px 18px; font-size: 14.5px; font-weight: 700; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: 0.16s; }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-primary { background: var(--teal); color: #fff; }
+    .upload-btn-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--teal);
+      color: var(--teal-dark);
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .upload-box input[type="file"] { display: none; }
+
+    .multi-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .preview-thumb-card {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .preview-thumb-card img {
+      width: 100%;
+      height: 95px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+    }
+
+    .remove-thumb-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(220, 85, 85, 0.92);
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .image-preview-wrap { display: none; margin-top: 12px; text-align: center; }
+    .image-preview { max-width: 100%; max-height: 240px; object-fit: contain; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+    .remove-img-btn { display: inline-block; margin-top: 8px; background: #fff0f0; color: var(--danger); border: 1px solid #f2c4c4; border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+    /* BUTTONS */
+    .button-row { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 22px; }
+    .btn { border: 0; border-radius: 10px; padding: 12px 20px; cursor: pointer; font-weight: 700; font-size: 14.5px; transition: .18s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--teal); color: white; }
     .btn-primary:hover:not(:disabled) { background: var(--teal-dark); }
-    .btn-secondary { background: #e8eef4; color: var(--navy); }
+    .btn-secondary { background: #e9eff5; color: #43566a; }
     .btn-secondary:hover:not(:disabled) { background: #dce4ed; }
-    .btn-line { background: #06c755; color: #fff; }
-    .btn-line:hover { background: #05a847; }
-    .btn-excel { background: #1d6f42; color: #fff; }
-    .btn-excel:hover { background: #155733; }
-    .btn-orange { background: #f39200; color: #fff; }
-    .btn-orange:hover { background: #d98200; }
-    .btn-small { padding: 7px 12px; font-size: 13px; min-height: 36px; border-radius: 8px; }
+    .btn-line { background: var(--line-green); color: white; }
+    .btn-small { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
 
-    .message { margin-bottom: 16px; padding: 12px 15px; border-radius: 10px; font-size: 14px; font-weight: 600; display: none; }
-    .message.success { display: block; background: #e6f7f1; border: 1px solid #9dd9c5; color: #16634b; }
-    .message.error { display: block; background: #fdecec; border: 1px solid #f0b2b2; color: #8c2323; }
+    /* MESSAGES */
+    .message { display: none; padding: 13px 15px; border-radius: 10px; font-size: 13.5px; margin: 14px 0; line-height: 1.6; font-weight: 500; }
+    .message.success { display: block; background: #e8f7f1; color: #156c49; border: 1px solid #b5e4d0; }
+    .message.error { display: block; background: #fff0f0; color: #b63b3b; border: 1px solid #f0caca; }
 
-    .list-toolbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
-    .report-filters { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-    .filter-group { display: flex; flex-direction: column; }
-    .report-result-count { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 12px; }
-    .report-list { display: flex; flex-direction: column; gap: 12px; }
+    /* LIST & DETAILS */
+    .list-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .report-list { display: grid; gap: 12px; }
+    .report-card { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+    .report-id { font-size: 12px; color: var(--teal-dark); font-weight: 800; margin-bottom: 4px; }
+    .report-location { font-size: 15.5px; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+    .report-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 12.5px; margin-bottom: 8px; }
+    .report-description { font-size: 13.5px; color: #475a6e; line-height: 1.55; }
+    .tag { display: inline-block; border-radius: 20px; padding: 3px 10px; background: #fff4e2; color: #9e630e; font-size: 11.5px; font-weight: 700; margin-bottom: 6px; }
+    .report-status { display: inline-block; padding: 5px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .report-status.pending { background: #fff4e2; color: #9e630e; }
+    .report-status.completed { background: #e6f6ef; color: #166e4a; }
+    .empty-state { text-align: center; padding: 40px 15px; color: var(--muted); background: #fafcfe; border: 1.5px dashed #d3dee8; border-radius: 12px; font-size: 14px; }
+    .empty-icon { font-size: 32px; margin-bottom: 8px; }
 
-    .report-card { border: 1px solid var(--border); border-radius: 12px; padding: 15px 16px; background: #fff; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; transition: 0.15s; }
-    .report-card:hover { border-color: #b7d7d5; box-shadow: 0 4px 12px rgba(14, 159, 154, 0.08); }
-    .report-card-main { display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
-    .report-thumb { width: 76px; height: 76px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; background: #f1f5f9; cursor: zoom-in; transition: transform 0.15s; }
-    .report-thumb:hover { transform: scale(1.04); }
-    .report-card-body { min-width: 0; flex: 1; }
-    .report-id { font-size: 13px; font-weight: 800; color: var(--teal-dark); }
-    .report-location { font-size: 15.5px; font-weight: 700; color: var(--navy); margin: 2px 0 4px; }
-    .report-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--muted); }
-    .meta-item { display: inline-flex; align-items: center; gap: 4px; }
-    .report-description { margin-top: 7px; font-size: 13.5px; color: #364556; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .report-status { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
-    .report-status.pending { background: #fff4df; color: #9c6500; border: 1px solid #f5d38c; }
-    .report-status.completed { background: #e5f6ef; color: #16684f; border: 1px solid #a8decb; }
-
-    .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; margin-top: 6px; border: 1px solid #d5e2ee; background: #eef3f8; color: #364a5e; }
-    .tag.haz-safety { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-    .tag.haz-physical { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-    .tag.haz-chemical { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
-    .tag.haz-biological { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
-    .tag.haz-ergonomic { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .tag.haz-psychosocial { background: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
-
-    .detail-section-title { font-size: 15px; font-weight: 700; color: var(--navy); margin: 16px 0 10px; }
-    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .detail-item { border: 1px solid #e6ecf2; border-radius: 10px; padding: 10px 12px; background: #fbfdff; }
-    .detail-label { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
-    .detail-value { font-size: 14px; color: var(--text); white-space: pre-wrap; word-break: break-word; }
-
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .detail-item { padding: 12px; background: #f6f9fc; border-radius: 10px; min-width: 0; }
+    .detail-label { color: var(--muted); font-size: 11.5px; font-weight: 600; margin-bottom: 4px; }
+    .detail-value { color: var(--text); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .detail-section-title { font-size: 15px; color: var(--navy); font-weight: 800; margin: 20px 0 10px; border-left: 4px solid var(--teal); padding-left: 10px; }
     .ba-image-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
-    .ba-image-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: #f8fafc; text-align: center; }
-    .ba-badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+    .ba-image-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: #fafcfe; }
+    .ba-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 8px; }
     .ba-badge.before { background: #fee2e2; color: #b91c1c; }
     .ba-badge.after { background: #dcfce7; color: #15803d; }
-    .report-detail-image { max-width: 100%; max-height: 280px; border-radius: 8px; border: 1px solid var(--border); display: block; margin: 0 auto 8px; cursor: zoom-in; }
-    .before-image-link { display: inline-block; margin-top: 6px; font-size: 13px; color: var(--teal-dark); font-weight: 700; text-decoration: none; }
-
-    .history-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .history-stat-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: #fff; }
-    .history-stat-label { font-size: 12.5px; color: var(--muted); font-weight: 700; }
-    .history-stat-value { font-size: 24px; font-weight: 800; color: var(--navy); }
-    .history-filter-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 12px; }
-    .history-list { display: flex; flex-direction: column; gap: 12px; }
-    .history-item { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: #fff; display: grid; grid-template-columns: 38px 1fr; gap: 12px; }
-    .history-icon { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: #e8f5f5; color: var(--teal-dark); font-weight: 800; }
-    .history-icon.correction { background: #e8f6ef; color: #1f8a65; }
-    .history-heading { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-    .history-action { font-weight: 700; color: var(--navy); }
-    .history-date { font-size: 12px; color: var(--muted); }
-    .history-report-id { font-size: 12.5px; color: var(--teal-dark); font-weight: 700; margin: 2px 0 4px; }
-    .history-description { font-size: 13.5px; color: #364556; }
-    .history-meta { font-size: 12px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
-
-    .skeleton-box { height: 76px; border-radius: 12px; background: linear-gradient(90deg, #eef2f6 25%, #e2e8f0 50%, #eef2f6 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .empty-state { border: 1px dashed #cbd6e2; border-radius: 12px; padding: 34px 20px; text-align: center; color: var(--muted); font-size: 14px; }
-    .empty-icon { display: inline-flex; padding: 12px; border-radius: 50%; background: #f1f5f9; color: #94a3b8; margin-bottom: 8px; }
+    .report-detail-image { display: block; width: 100%; max-height: 280px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid var(--border); }
+    .before-image-link { display: inline-block; color: var(--teal-dark); font-size: 12.5px; margin-top: 8px; font-weight: 700; text-decoration: none; }
     .form-hidden { display: none !important; }
 
-    .toast-container { position: fixed; top: 18px; right: 18px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-    .toast { background: #142b45; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22); display: flex; align-items: center; gap: 10px; pointer-events: auto; animation: slideInToast 0.25s ease; max-width: 360px; }
-    .toast.success { border-left: 5px solid #2ecc71; }
-    .toast.error { border-left: 5px solid #e74c3c; }
-    @keyframes slideInToast { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
-    .toast.fade-out { opacity: 0; transform: translateY(-8px); transition: 0.25s; }
+    .report-filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: 12px; color: #526579; }
+    .report-result-count { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
 
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 33, 54, 0.65); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(2px); }
-    .modal-box { background: #fff; border-radius: 16px; width: min(560px, 100%); max-height: 90vh; overflow-y: auto; padding: 22px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .modal-title { font-size: 18px; font-weight: 800; color: var(--navy); margin: 0; display: flex; align-items: center; gap: 8px; }
-    .modal-close { border: 0; background: #eef3f8; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; font-weight: 700; color: var(--navy); }
-    .line-preview-box { background: #f4f7fa; border: 1px solid #d5e0eb; border-radius: 10px; padding: 12px; font-size: 13.5px; white-space: pre-wrap; margin-bottom: 14px; color: #1b2a3c; max-height: 220px; overflow-y: auto; }
-    .line-tip-box { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 12.5px; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; line-height: 1.45; }
+    /* DASHBOARD */
+    .dashboard-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .stat-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+    .stat-label { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+    .stat-value { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1.2; }
+    .stat-note { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+    .stat-card.pending .stat-value { color: var(--warning); }
+    .stat-card.completed .stat-value { color: var(--success); }
+    .stat-card.areas .stat-value { color: var(--teal-dark); }
 
-    .guide-step-list { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 18px; }
-    .guide-step-card { display: grid; grid-template-columns: 124px 1fr; gap: 14px; align-items: center; background: #f8fbfd; border: 1px solid #dbe5ef; border-radius: 12px; padding: 12px; }
-    .guide-visual-box { width: 124px; height: 86px; border-radius: 9px; overflow: hidden; border: 1px solid #cbd5e1; background: #ffffff; display: grid; place-items: center; flex-shrink: 0; }
-    .guide-visual-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .guide-step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .guide-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; flex-shrink: 0; }
-    .guide-step-title { font-family: 'Prompt', 'Sarabun', sans-serif; font-size: 14.5px; font-weight: 700; color: var(--navy); }
-    .guide-step-desc { font-size: 13px; color: #475569; line-height: 1.45; }
-    @media (max-width: 560px) { .guide-step-card { grid-template-columns: 1fr; } .guide-visual-box { width: 100%; height: 130px; } }
+    .dashboard-chart-grid, .dashboard-table-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .chart-wide { grid-column: 1 / -1; }
+    .donut-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 6px 0; }
+    .donut-svg { display: block; width: 150px; height: 150px; flex: 0 0 150px; }
+    .chart-legend { display: grid; grid-template-columns: 1fr; gap: 8px; min-width: 180px; flex: 1; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-value { margin-left: auto; font-weight: 700; }
+    .bar-list { display: grid; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(90px, 1.2fr) 2fr auto; gap: 10px; align-items: center; font-size: 12.5px; }
+    .bar-track { height: 11px; border-radius: 20px; background: #edf1f5; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 20px; }
+    .bar-value { font-weight: 700; min-width: 26px; text-align: right; }
+    .trend-svg { width: 100%; height: auto; display: block; }
+    .table-responsive { width: 100%; overflow-x: auto; }
+    .dashboard-data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 400px; }
+    .dashboard-data-table th, .dashboard-data-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    .dashboard-data-table th { background: #f3f6fa; color: var(--navy); font-weight: 700; white-space: nowrap; }
+    .dashboard-data-table td.num, .dashboard-data-table th.num { text-align: right; }
 
-    .lightbox-backdrop { position: fixed; inset: 0; background: rgba(10, 18, 28, 0.9); z-index: 4000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
-    .lightbox-img { max-width: 96vw; max-height: 82vh; border-radius: 10px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
-    .lightbox-caption { color: #e2e8f0; font-size: 13.5px; margin-top: 12px; font-weight: 600; text-align: center; }
+    /* HISTORY */
+    .history-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .history-stat-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+    .history-stat-label { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+    .history-stat-value { font-size: 25px; font-weight: 800; color: var(--navy); }
+    .history-filter-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .history-list { display: grid; gap: 12px; }
+    .history-item { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 15px; border: 1px solid var(--border); border-radius: 12px; background: white; }
+    .history-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-size: 17px; background: var(--teal-soft); color: var(--teal-dark); font-weight: 800; }
+    .history-icon.correction { background: #e8f7f1; color: var(--success); }
+    .history-heading { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+    .history-action { font-size: 14.5px; font-weight: 800; color: var(--navy); }
+    .history-date { font-size: 12px; color: var(--muted); }
+    .history-report-id { font-size: 12px; color: var(--teal-dark); font-weight: 800; margin-bottom: 5px; }
+    .history-description { font-size: 13px; color: #4e6174; line-height: 1.55; }
+    .history-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
 
-    @media (max-width: 900px) {
-      body { padding-bottom: 74px; }
-      .app { flex-direction: column; }
-      .sidebar { position: fixed; bottom: 0; top: auto; left: 0; right: 0; width: 100%; height: 68px; flex-direction: row; padding: 4px 4px env(safe-area-inset-bottom); border-top: 1px solid rgba(255, 255, 255, 0.14); z-index: 1000; }
+    /* MODAL & USER GUIDE */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(12, 28, 44, 0.65);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-box {
+      width: min(650px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      padding: 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title { margin: 0; color: var(--navy); font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .modal-close { border: 0; border-radius: 8px; background: #f0f3f6; color: #42566b; width: 34px; height: 34px; font-size: 20px; cursor: pointer; }
+
+    .guide-step-list { display: grid; gap: 12px; margin: 14px 0 18px; }
+    .guide-step-card {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fbfdff;
+    }
+    .guide-visual-box { width: 100%; height: 115px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background: #fff; }
+    .guide-step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .guide-step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; flex-shrink: 0; }
+    .guide-step-title { font-size: 15px; font-weight: 800; color: var(--navy); }
+    .guide-step-desc { font-size: 13px; color: #475569; line-height: 1.55; }
+
+    .line-preview-box { background: #f4f7f9; border: 1px solid #d5e0e8; border-radius: 10px; padding: 14px; font-size: 13.5px; white-space: pre-wrap; line-height: 1.6; color: #1e293b; margin-bottom: 16px; }
+
+    @media (max-width: 768px) {
+      .app { display: block; padding-bottom: 76px; }
+      .sidebar { position: fixed; bottom: 0; left: 0; right: 0; top: auto; width: 100%; min-width: 0; height: 68px; min-height: 68px; padding: 4px 6px; z-index: 1000; flex-direction: row; box-shadow: 0 -4px 16px rgba(0,0,0,0.14); }
       .brand, .nav-label, .sidebar-footer { display: none; }
-      .nav-menu { flex-direction: row; width: 100%; justify-content: space-around; gap: 2px; align-items: center; }
-      .nav-item { flex-direction: column; justify-content: center; align-items: center; padding: 6px 2px; font-size: 10.5px; gap: 3px; border-radius: 8px; }
-      .nav-badge { position: absolute; top: 3px; right: 12%; padding: 1px 5px; font-size: 10px; }
-      .mobile-header { display: flex; align-items: center; justify-content: space-between; background: var(--navy); color: #fff; padding: 10px 14px; position: sticky; top: 0; z-index: 900; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14); }
-      .mobile-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-      .mobile-logo-wrap { width: 36px; height: 36px; background: #ffffff; padding: 3px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; }
-      .mobile-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
-      .mobile-title-wrap { min-width: 0; }
-      .mobile-app-name { font-weight: 800; font-size: 16px; line-height: 1.15; }
-      .mobile-company-name { font-size: 11px; color: #fbbf24; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .fab-add { display: flex; align-items: center; justify-content: center; position: fixed; right: 16px; bottom: 82px; width: 54px; height: 54px; border-radius: 50%; background: var(--teal); color: #fff; border: 0; box-shadow: 0 6px 20px rgba(14, 159, 154, 0.45); z-index: 950; cursor: pointer; transition: 0.2s; }
-      .fab-add:active { transform: scale(0.92); }
-      .fab-add.hidden { display: none; }
-      .toast-container { top: 64px; right: 12px; left: 12px; }
-      .toast { max-width: 100%; }
+      .nav-menu { flex-direction: row; width: 100%; justify-content: space-around; align-items: center; gap: 2px; }
+      .nav-item { flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; gap: 3px; border-radius: 8px; text-align: center; font-size: 10.5px; flex: 1; }
+      .nav-icon { font-size: 19px; line-height: 1; }
+      .nav-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+      .nav-badge { position: absolute; top: 3px; right: 12%; font-size: 10px; padding: 1px 5px; min-width: 18px; }
+      .mobile-header { display: flex; align-items: center; justify-content: space-between; background: var(--navy); color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 900; }
+      .mobile-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+      .mobile-brand-badge { width: 30px; height: 30px; background: var(--teal); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
       .main { padding: 16px 14px; }
-      .topbar { margin-bottom: 16px; }
       .page-title { font-size: 20px; }
-      .company-pill { display: none; }
-      .dashboard-toolbar { flex-direction: column; align-items: stretch; }
-      .dashboard-filter-wrap { width: 100%; }
-      .dashboard-month-select { width: 100% !important; }
-      .dashboard-actions { width: 100%; }
-      .dashboard-actions .btn { flex: 1; }
+      .system-label { display: none; }
       .card { padding: 16px; border-radius: 12px; }
-      .form-grid, .detail-grid, .ba-image-grid, .dashboard-chart-grid, .dashboard-table-grid { grid-template-columns: 1fr; }
+      .form-grid, .detail-grid, .ba-image-grid, .dashboard-chart-grid, .dashboard-table-grid, .guide-step-card { grid-template-columns: 1fr; }
       .dashboard-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .stat-value { font-size: 24px; }
       .report-card { grid-template-columns: 1fr; }
-      .report-thumb { width: 66px; height: 66px; }
       .report-filters, .history-filter-grid, .history-stats { grid-template-columns: 1fr; }
       .button-row { flex-direction: column-reverse; }
       .button-row .btn { width: 100%; }
     }
   </style>
 </head>
+
 <body>
-<div class="toast-container" id="toastContainer"></div>
-<datalist id="userListDatalist"></datalist>
 <div class="app">
+
+  <!-- MOBILE HEADER -->
   <header class="mobile-header">
     <div class="mobile-brand">
-      <div class="mobile-logo-wrap" id="mobileLogoContainer"></div>
-      <div class="mobile-title-wrap">
-        <div class="mobile-app-name" id="mobileSystemName">SafeTrack</div>
-        <div class="mobile-company-name" id="mobileCompanyName">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</div>
-      </div>
+      <div class="mobile-brand-badge">🦺</div>
+      <span>SafeTrack</span>
     </div>
+    <button type="button" class="btn btn-small" style="background:rgba(255,255,255,0.15); color:#fff;" onclick="openUserGuideModal(true)">📖 คู่มือ</button>
   </header>
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-logo-wrap" id="desktopLogoContainer"></div>
-      <div class="brand-info">
-        <div class="brand-name" id="desktopSystemName">SafeTrack</div>
-        <div class="brand-company" id="desktopCompanyName">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</div>
+      <div class="brand-icon">🦺</div>
+      <div>
+        <div class="brand-name">SafeTrack</div>
+        <div class="brand-sub">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</div>
       </div>
     </div>
+
     <div class="nav-label">MAIN MENU</div>
+
     <nav class="nav-menu">
       <button class="nav-item active" data-page="dashboard">
-        <span class="nav-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>
+        <span class="nav-icon">▦</span>
         <span class="nav-text">ภาพรวม</span>
       </button>
       <button class="nav-item" data-page="add-report">
-        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        <span class="nav-icon">＋</span>
         <span class="nav-text">แจ้งความเสี่ยง</span>
       </button>
       <button class="nav-item" data-page="reports">
-        <span class="nav-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <span class="nav-icon">▤</span>
         <span class="nav-text">รายการทั้งหมด</span>
       </button>
       <button class="nav-item" data-page="corrections">
-        <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <span class="nav-icon">✓</span>
         <span class="nav-text">บันทึกผลแก้ไข</span>
         <span class="nav-badge" id="pendingNavBadge">0</span>
       </button>
       <button class="nav-item" data-page="history">
-        <span class="nav-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></span>
+        <span class="nav-icon">◷</span>
         <span class="nav-text">ประวัติระบบ</span>
       </button>
     </nav>
-    <div class="sidebar-footer" id="sidebarFooterText"><strong>บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</strong><br>ระบบจัดการความปลอดภัยในการทำงาน</div>
+
+    <div class="sidebar-footer">
+      SafeTrack v2.5<br>
+      โครงการทางพิเศษฉลองรัชส่วนต่อขยาย (จตุโชติ-ลำลูกกา)
+    </div>
   </aside>
 
-  <button type="button" class="fab-add" id="fabAddReport" title="แจ้งความเสี่ยงด่วน">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
-
+  <!-- MAIN CONTENT -->
   <main class="main">
+
     <div class="topbar">
       <div>
         <h1 class="page-title" id="pageTitle">ภาพรวมระบบ</h1>
-        <div class="page-subtitle" id="pageSubtitle">ระบบจัดการและติดตามความเสี่ยงในการทำงาน</div>
+        <div class="page-subtitle" id="pageSubtitle">สรุปสถิติและสถานะการจัดการความเสี่ยง</div>
       </div>
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-help-pill" onclick="openUserGuideModal(true)"><span>❓</span> วิธีใช้งานระบบ</button>
-        <div class="company-pill"><span class="company-pill-dot"></span><span id="topbarCompanyName">บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</span></div>
+      <div class="topbar-right">
+        <button type="button" class="btn btn-secondary btn-small" onclick="openUserGuideModal(true)">📖 วิธีใช้งาน</button>
+        <div class="system-label">● บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์</div>
       </div>
     </div>
 
+    <!-- ================= 1. DASHBOARD ================= -->
     <section class="section active" id="page-dashboard">
-      <div class="dashboard-toolbar">
-        <div class="dashboard-filter-wrap">
-          <label for="dashboardMonthFilter"><span class="label-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>ช่วงเวลาแสดงผล:</label>
-          <select id="dashboardMonthFilter" class="dashboard-month-select"><option value="ALL">📊 ภาพรวมทั้งหมด (สะสม)</option></select>
-        </div>
-        <div class="dashboard-actions">
-          <button type="button" class="btn btn-secondary btn-small" id="refreshDashboardBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>โหลดข้อมูลใหม่</button>
-          <button type="button" class="btn btn-primary btn-small" id="printDashboardBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>พิมพ์สรุป Dashboard</button>
-        </div>
+      <div class="dashboard-actions">
+        <button type="button" class="btn btn-secondary btn-small" id="refreshDashboardBtn">↻ โหลดข้อมูลใหม่</button>
+        <button type="button" class="btn btn-primary btn-small" id="printDashboardBtn">🖨️ พิมพ์สรุป Dashboard</button>
       </div>
+
       <div id="dashboardMessage" class="message"></div>
-      <div id="overdueAlertContainer"></div>
 
       <div class="dashboard-stats">
         <div class="stat-card">
-          <div class="stat-top"><div class="stat-label">รายงานทั้งหมด</div><div class="stat-icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div></div>
+          <div class="stat-label">รายงานทั้งหมด</div>
           <div class="stat-value" id="totalReports">-</div>
-          <div class="stat-note" id="totalReportsNote">จำนวนรายงานในระบบ</div>
+          <div class="stat-note">จำนวนรายงานสะสมทั้งหมด</div>
         </div>
         <div class="stat-card pending">
-          <div class="stat-top"><div class="stat-label">รอดำเนินการ</div><div class="stat-icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+          <div class="stat-label">รอดำเนินการ</div>
           <div class="stat-value" id="pendingReports">-</div>
           <div class="stat-note">รอบันทึกผลการแก้ไข</div>
         </div>
         <div class="stat-card completed">
-          <div class="stat-top"><div class="stat-label">ดำเนินการแล้ว</div><div class="stat-icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
+          <div class="stat-label">ดำเนินการแล้ว</div>
           <div class="stat-value" id="completedReports">-</div>
           <div class="stat-note">บันทึกผลแก้ไขเรียบร้อย</div>
         </div>
         <div class="stat-card areas">
-          <div class="stat-top"><div class="stat-label" id="activeAreasLabel">พื้นที่ที่ใช้งาน</div><div class="stat-icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>
+          <div class="stat-label">พื้นที่ที่ใช้งาน</div>
           <div class="stat-value" id="activeAreas">-</div>
-          <div class="stat-note" id="activeAreasNote">พื้นที่เปิดใช้งาน</div>
+          <div class="stat-note">พื้นที่เปิดใช้งานในระบบ</div>
         </div>
       </div>
 
       <div class="card">
         <h2 class="card-title">สถานะรายงานความเสี่ยง</h2>
         <div class="card-description">สัดส่วนรายการที่รอดำเนินการเทียบกับรายการที่แก้ไขแล้ว</div>
-        <div id="statusOverview"><div class="skeleton-box"></div></div>
+        <div id="statusOverview"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
       </div>
 
       <div class="dashboard-chart-grid">
-        <div class="card"><h2 class="card-title">สัดส่วนประเภทอันตราย</h2><div class="card-description">จำแนกตามประเภทอันตราย</div><div id="hazardCategoryChart"><div class="skeleton-box"></div></div></div>
-        <div class="card"><h2 class="card-title">รายงานตามพื้นที่</h2><div class="card-description">เปรียบเทียบจำนวนรายงานในแต่ละพื้นที่</div><div id="areaReportsChart"><div class="skeleton-box"></div></div></div>
-        <div class="card chart-wide"><h2 class="card-title">แนวโน้มรายงานความเสี่ยงรายเดือน</h2><div class="card-description">สถิติเปรียบเทียบรายเดือนย้อนหลัง 6 เดือนล่าสุด</div><div id="monthlyTrendChart"><div class="skeleton-box"></div></div></div>
+        <div class="card">
+          <h2 class="card-title">สัดส่วนประเภทอันตราย</h2>
+          <div class="card-description">จำแนกตามประเภทอันตราย</div>
+          <div id="hazardCategoryChart"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">รายงานตามพื้นที่</h2>
+          <div class="card-description">เปรียบเทียบจำนวนรายงานในแต่ละพื้นที่</div>
+          <div id="areaReportsChart"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+        </div>
+        <div class="card chart-wide">
+          <h2 class="card-title">แนวโน้มรายงานความเสี่ยงรายเดือน</h2>
+          <div class="card-description">สถิติย้อนหลัง 6 เดือนล่าสุด</div>
+          <div id="monthlyTrendChart"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+        </div>
       </div>
 
       <div class="dashboard-table-grid">
-        <div class="card"><h2 class="card-title">สรุปแยกตามพื้นที่</h2><div id="areaSummaryTable" class="table-responsive"><div class="skeleton-box"></div></div></div>
-        <div class="card"><h2 class="card-title">สรุปแยกตามประเภทอันตราย</h2><div id="hazardSummaryTable" class="table-responsive"><div class="skeleton-box"></div></div></div>
+        <div class="card">
+          <h2 class="card-title">สรุปแยกตามพื้นที่</h2>
+          <div id="areaSummaryTable" class="table-responsive"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">สรุปแยกตามประเภทอันตราย</h2>
+          <div id="hazardSummaryTable" class="table-responsive"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+        </div>
       </div>
 
-      <div class="card"><h2 class="card-title" id="dashboardLatestTitle">รายการความเสี่ยงล่าสุด 10 รายการ</h2><div id="dashboardLatestTable" class="table-responsive"><div class="skeleton-box"></div></div></div>
+      <div class="card">
+        <h2 class="card-title">รายการความเสี่ยงล่าสุด 10 รายการ</h2>
+        <div id="dashboardLatestTable" class="table-responsive"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+      </div>
     </section>
 
+    <!-- ================= 2. ADD REPORT ================= -->
     <section class="section" id="page-add-report">
       <div class="card">
-        <div class="card-header-flex">
-          <div class="card-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          <h2 class="card-title">แบบบันทึกรายงานความเสี่ยง</h2>
-        </div>
-        <div class="card-description">กรอกรายละเอียดจุดเสี่ยงที่ตรวจพบ ระบบจะย่อขนาดภาพให้อัตโนมัติ</div>
+        <h2 class="card-title">แบบบันทึกรายงานความเสี่ยง</h2>
+        <div class="card-description">กรอกรายละเอียดจุดเสี่ยงที่ตรวจพบ ถ่ายรูปได้สูงสุด 6 รูป ระบบจะย่อขนาดภาพให้อัตโนมัติ</div>
+
         <div id="formMessage" class="message"></div>
 
         <form id="riskForm">
           <div class="form-grid">
             <div class="form-group">
-              <label for="reportDateTime"><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>วันและเวลาที่พบความเสี่ยง<span class="required">*</span></label>
+              <label for="reportDateTime">วันและเวลาที่พบความเสี่ยง<span class="required">*</span></label>
               <input type="datetime-local" id="reportDateTime" required>
             </div>
+
             <div class="form-group">
-              <label for="reporterSelect"><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ผู้รายงาน (จป. / ผู้ช่วย จป.)<span class="required">*</span></label>
-              <input type="text" id="reporterSelect" list="userListDatalist" placeholder="พิมพ์ชื่อผู้รายงาน (จป. / ผู้ช่วย จป.)" required>
+              <label for="reporterSelect">ผู้รายงาน (จป. / ผู้ช่วย จป.)<span class="required">*</span></label>
+              <select id="reporterSelect" required>
+                <option value="">กำลังโหลดรายชื่อ...</option>
+              </select>
             </div>
+
             <div class="form-group">
-              <label for="sectionSelect"><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg></span>พื้นที่หลัก (Section)<span class="required">*</span></label>
-              <select id="sectionSelect" required><option value="">เลือกพื้นที่หลัก</option></select>
+              <label for="sectionSelect">พื้นที่หลัก (Section)<span class="required">*</span></label>
+              <select id="sectionSelect" required>
+                <option value="">เลือกพื้นที่หลัก</option>
+              </select>
             </div>
+
             <div class="form-group">
-              <label for="areaSelect"><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>พื้นที่ย่อย<span class="required">*</span></label>
-              <select id="areaSelect" required><option value="">เลือกพื้นที่ย่อย</option></select>
+              <label for="areaSelect">พื้นที่ย่อย<span class="required">*</span></label>
+              <select id="areaSelect" required>
+                <option value="">เลือกพื้นที่ย่อย</option>
+              </select>
             </div>
+
             <div class="form-group full">
               <label for="locationDetail">รายละเอียดตำแหน่งที่พบความเสี่ยง<span class="required">*</span></label>
-              <input type="text" id="locationDetail" placeholder="เช่น ทางเดินข้างเครื่องจักรหมายเลข 2" required>
+              <input type="text" id="locationDetail" placeholder="เช่น ตอม่อ P.12 ทางเดินข้างพื้นที่ขุดเจาะ" required>
             </div>
+
             <div class="form-group">
-              <label for="hazardCategory"><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></span>ประเภทอันตราย<span class="required">*</span></label>
+              <label for="hazardCategory">ประเภทอันตราย<span class="required">*</span></label>
               <select id="hazardCategory" required>
                 <option value="">เลือกประเภทอันตราย</option>
                 <option value="ด้านความปลอดภัย">ด้านความปลอดภัย</option>
@@ -454,69 +659,97 @@
                 <option value="ด้านจิตสังคม">ด้านจิตสังคม</option>
               </select>
             </div>
+
             <div class="form-group">
               <label for="supervisorSelect">ผู้ควบคุมงาน / ผู้รับผิดชอบ</label>
-              <input type="text" id="supervisorSelect" list="userListDatalist" placeholder="พิมพ์ชื่อผู้รับผิดชอบ (ถ้ามี)">
+              <select id="supervisorSelect">
+                <option value="">เลือกผู้รับผิดชอบ (ถ้ามี)</option>
+              </select>
             </div>
+
             <div class="form-group full">
               <label for="unsafeCondition">สภาพการณ์ที่ไม่ปลอดภัย (Unsafe Condition)<span class="required">*</span></label>
               <textarea id="unsafeCondition" placeholder="อธิบายสภาพการณ์หรือสิ่งที่ตรวจพบ..." required></textarea>
             </div>
+
             <div class="form-group full">
               <label for="potentialIncident">เหตุการณ์หรืออุบัติเหตุที่อาจเกิดขึ้น<span class="required">*</span></label>
               <textarea id="potentialIncident" placeholder="ระบุผลกระทบหรืออุบัติเหตุที่อาจเกิดขึ้น..." required></textarea>
             </div>
+
             <div class="form-group full">
               <label for="longTermControl">แนวทางป้องกันและควบคุมในระยะยาว</label>
               <textarea id="longTermControl" placeholder="ระบุแนวทางป้องกันไม่ให้เกิดเหตุการณ์ซ้ำ (ถ้ามี)..."></textarea>
             </div>
+
             <div class="form-group full">
-              <label><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>ภาพถ่ายก่อนการแก้ไข</label>
+              <label>ภาพถ่ายก่อนการแก้ไข (สูงสุด 6 รูป)</label>
               <div class="upload-box">
-                <label for="beforeImage" class="upload-btn-label"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>ถ่ายรูป / เลือกรูปภาพ (หลายรูปได้)</label>
-                <input type="file" id="beforeImage" accept="image/*" multiple>
-                <div class="hint" id="beforeImageHint">รองรับภาพจากกล้องมือถือ (สูงสุด 6 รูป) ระบบจะปรับขนาดให้อัตโนมัติ</div>
-                <div class="image-preview-wrap" id="beforePreviewWrap"><img id="beforePreview" class="image-preview" alt="ภาพก่อนการแก้ไข"></div>
+                <label for="beforeImagesInput" class="upload-btn-label">📷 ถ่ายรูป / เลือกรูปจุดเสี่ยง</label>
+                <input type="file" id="beforeImagesInput" accept="image/*" multiple>
+                <div class="hint" id="beforeImageHint">รองรับภาพจากกล้องมือถือสูงสุด 6 รูป ระบบจะปรับขนาดให้อัตโนมัติ</div>
+                <div class="multi-preview-grid" id="beforeMultiPreviewGrid"></div>
               </div>
             </div>
           </div>
+
           <div class="button-row">
             <button type="reset" class="btn btn-secondary" id="resetRiskBtn">ล้างข้อมูล</button>
-            <button type="submit" class="btn btn-primary" id="saveRiskBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>บันทึกรายงานความเสี่ยง</button>
+            <button type="submit" class="btn btn-primary" id="saveRiskBtn">💾 บันทึกรายงานความเสี่ยง</button>
           </div>
         </form>
       </div>
     </section>
 
+    <!-- ================= 3. ALL REPORTS ================= -->
     <section class="section" id="page-reports">
       <div class="card">
         <div class="list-toolbar">
           <div>
             <h2 class="card-title">รายการความเสี่ยงทั้งหมด</h2>
-            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After แชร์เข้า LINE ส่งออก Excel (.xlsx) และสั่งพิมพ์รายงาน</div>
+            <div class="card-description" style="margin-bottom:0">ค้นหา ตรวจสอบรายละเอียด Before/After และสั่งพิมพ์รายงาน</div>
           </div>
-          <div class="toolbar-actions">
-            <button type="button" class="btn btn-excel btn-small" onclick="exportReportsToExcel()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>ส่งออกไฟล์ Excel (.xlsx)</button>
-            <button type="button" class="btn btn-primary btn-small" onclick="printFilteredReports()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>พิมพ์รายการที่แสดงอยู่</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-small" onclick="printFilteredReports()">🖨️ พิมพ์รายการที่แสดงอยู่</button>
             <button type="button" class="btn btn-secondary btn-small" id="refreshReportsBtn">↻ รีเฟรช</button>
           </div>
         </div>
+
         <div id="reportsMessage" class="message"></div>
+
         <div class="report-filters">
-          <div class="filter-group"><label for="reportSearch">ค้นหารายงาน</label><input type="search" id="reportSearch" placeholder="ค้นหารหัส, ผู้รายงาน, พื้นที่, รายละเอียด..."></div>
-          <div class="filter-group"><label for="reportStatusFilter">สถานะรายงาน</label><select id="reportStatusFilter"><option value="">ทุกสถานะ</option><option value="บันทึกความเสี่ยงแล้ว">บันทึกความเสี่ยงแล้ว (รอแก้ไข)</option><option value="แจ้งผลการแก้ไขแล้ว">แจ้งผลการแก้ไขแล้ว</option></select></div>
-          <div class="filter-group"><label for="reportAreaFilter">พื้นที่หลัก</label><select id="reportAreaFilter"><option value="">ทุกพื้นที่</option></select></div>
+          <div class="filter-group">
+            <label for="reportSearch">ค้นหารายงาน</label>
+            <input type="search" id="reportSearch" placeholder="ค้นหารหัส, ผู้รายงาน, พื้นที่, รายละเอียด...">
+          </div>
+          <div class="filter-group">
+            <label for="reportStatusFilter">สถานะรายงาน</label>
+            <select id="reportStatusFilter">
+              <option value="">ทุกสถานะ</option>
+              <option value="บันทึกความเสี่ยงแล้ว">บันทึกความเสี่ยงแล้ว (รอแก้ไข)</option>
+              <option value="แจ้งผลการแก้ไขแล้ว">แจ้งผลการแก้ไขแล้ว</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="reportAreaFilter">พื้นที่หลัก</label>
+            <select id="reportAreaFilter">
+              <option value="">ทุกพื้นที่</option>
+            </select>
+          </div>
         </div>
+
         <div class="report-result-count" id="reportResultCount">กำลังโหลดข้อมูล...</div>
-        <div class="report-list" id="allReportsList"><div class="skeleton-box"></div><div class="skeleton-box"></div></div>
+        <div class="report-list" id="allReportsList"><div class="empty-state">กำลังโหลดรายการความเสี่ยง...</div></div>
       </div>
 
       <div class="card form-hidden" id="allReportDetailCard">
         <div class="list-toolbar">
-          <div><h2 class="card-title">รายละเอียดรายงานความเสี่ยงและผลการแก้ไข</h2><div class="card-description" style="margin-bottom:0">คลิกที่รูปภาพเพื่อขยายเต็มจอ หรือกดแชร์เข้ากลุ่ม LINE และพิมพ์ A4</div></div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-left:auto;">
-            <button type="button" class="btn btn-line btn-small" onclick="shareCurrentReportToLine()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>แชร์เข้า LINE</button>
-            <button type="button" class="btn btn-primary btn-small" onclick="printCurrentRiskReport()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>พิมพ์รายงานนี้ (A4)</button>
+          <div>
+            <h2 class="card-title">รายละเอียดรายงานความเสี่ยงและผลการแก้ไข</h2>
+            <div class="card-description" style="margin-bottom:0">แสดงข้อมูลครบถ้วนพร้อมภาพเปรียบเทียบก่อน-หลังแก้ไข</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-small" onclick="printCurrentRiskReport()">🖨️ พิมพ์รายงานนี้ (A4)</button>
             <button type="button" class="btn btn-secondary btn-small" id="closeReportDetailBtn">✕ ปิด</button>
           </div>
         </div>
@@ -524,892 +757,212 @@
       </div>
     </section>
 
+    <!-- ================= 4. CORRECTIONS ================= -->
     <section class="section" id="page-corrections">
       <div class="card">
         <div class="list-toolbar">
-          <div><h2 class="card-title">รายการความเสี่ยงที่รอบันทึกผล</h2><div class="card-description" style="margin-bottom:0">เลือกรายการที่ตรวจสอบการแก้ไขแล้ว เพื่อปิดงาน</div></div>
+          <div>
+            <h2 class="card-title">รายการความเสี่ยงที่รอบันทึกผล</h2>
+            <div class="card-description" style="margin-bottom:0">เลือกรายการที่ตรวจสอบการแก้ไขแล้ว เพื่อปิดงาน</div>
+          </div>
           <button type="button" class="btn btn-secondary btn-small" id="refreshCorrectionBtn">↻ โหลดใหม่</button>
         </div>
+
         <div id="correctionListMessage" class="message"></div>
         <div class="report-result-count" id="pendingCount"></div>
-        <div class="report-list" id="correctionReportList"><div class="skeleton-box"></div><div class="skeleton-box"></div></div>
+        <div class="report-list" id="correctionReportList"><div class="empty-state">กำลังโหลดรายการ...</div></div>
       </div>
 
       <div class="card form-hidden" id="selectedReportCard">
-        <div class="list-toolbar"><h2 class="card-title" style="margin:0;">ข้อมูลความเสี่ยงที่เลือก</h2><button type="button" class="btn btn-secondary btn-small" id="cancelCorrectionBtn">✕ ยกเลิกการเลือก</button></div>
+        <div class="list-toolbar">
+          <h2 class="card-title" style="margin:0;">ข้อมูลความเสี่ยงที่เลือก</h2>
+          <button type="button" class="btn btn-secondary btn-small" id="cancelCorrectionBtn">✕ ยกเลิกการเลือก</button>
+        </div>
         <div id="selectedReportDetail"></div>
       </div>
 
       <div class="card form-hidden" id="correctionFormCard">
-        <div class="card-header-flex">
-          <div class="card-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
-          <h2 class="card-title">แบบบันทึกผลการแก้ไข</h2>
-        </div>
+        <h2 class="card-title">แบบบันทึกผลการแก้ไข</h2>
         <div class="card-description">บันทึกผลหลังจาก จป. ตรวจสอบการดำเนินการแก้ไขในพื้นที่แล้ว</div>
+
         <div id="correctionMessage" class="message"></div>
 
         <form id="correctionForm">
           <div class="form-grid">
-            <div class="form-group"><label for="correctionDateTime">วันและเวลาที่ตรวจสอบผลการแก้ไข<span class="required">*</span></label><input type="datetime-local" id="correctionDateTime" required></div>
-            <div class="form-group"><label for="correctedBy">ผู้ปฏิบัติงานแก้ไข (คนงาน / ผู้รับเหมา)<span class="required">*</span></label><input type="text" id="correctedBy" placeholder="ระบุชื่อผู้ที่ลงมือแก้ไข" required></div>
-            <div class="form-group full"><label for="correctionDetail">รายละเอียดผลการแก้ไข<span class="required">*</span></label><textarea id="correctionDetail" placeholder="อธิบายว่ามีการแก้ไขอย่างไร และผลการตรวจสอบเป็นอย่างไร..." required></textarea></div>
-            <div class="form-group full"><label for="correctionRecordedBy">ผู้ตรวจสอบและบันทึกผล (จป. / ผู้ช่วย จป.)<span class="required">*</span></label><input type="text" id="correctionRecordedBy" list="userListDatalist" placeholder="พิมพ์ชื่อผู้ตรวจสอบและบันทึกผล (จป. / ผู้ช่วย จป.)" required></div>
+            <div class="form-group">
+              <label for="correctionDateTime">วันและเวลาที่ตรวจสอบผลการแก้ไข<span class="required">*</span></label>
+              <input type="datetime-local" id="correctionDateTime" required>
+            </div>
+            <div class="form-group">
+              <label for="correctedBy">ผู้ปฏิบัติงานแก้ไข (คนงาน / ผู้รับเหมา)<span class="required">*</span></label>
+              <input type="text" id="correctedBy" placeholder="ระบุชื่อผู้ที่ลงมือแก้ไข" required>
+            </div>
             <div class="form-group full">
-              <label><span class="label-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>ภาพถ่ายหลังการแก้ไข (ถ้ามี)</label>
+              <label for="correctionDetail">รายละเอียดผลการแก้ไข<span class="required">*</span></label>
+              <textarea id="correctionDetail" placeholder="อธิบายว่ามีการแก้ไขอย่างไร และผลการตรวจสอบเป็นอย่างไร..." required></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="correctionRecordedBy">ผู้ตรวจสอบและบันทึกผล (จป. / ผู้ช่วย จป.)<span class="required">*</span></label>
+              <select id="correctionRecordedBy" required>
+                <option value="">เลือกผู้บันทึกผล</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>ภาพถ่ายหลังการแก้ไข (ถ้ามี)</label>
               <div class="upload-box">
-                <label for="afterImage" class="upload-btn-label"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>ถ่ายรูป / เลือกรูปหลังแก้ไข (หลายรูปได้)</label>
-                <input type="file" id="afterImage" accept="image/*" multiple>
-                <div class="hint" id="afterImageHint">รองรับภาพจากกล้องมือถือ (สูงสุด 6 รูป) ระบบจะปรับขนาดให้อัตโนมัติ</div>
-                <div class="image-preview-wrap" id="afterPreviewWrap"><img id="afterPreview" class="image-preview" alt="ภาพหลังการแก้ไข"></div>
+                <label for="afterImage" class="upload-btn-label">📷 ถ่ายรูป / เลือกรูปหลังแก้ไข</label>
+                <input type="file" id="afterImage" accept="image/*">
+                <div class="hint" id="afterImageHint">รองรับภาพจากกล้องมือถือ ระบบจะปรับขนาดให้อัตโนมัติ</div>
+                <div class="image-preview-wrap" id="afterPreviewWrap">
+                  <img id="afterPreview" class="image-preview" alt="ภาพหลังการแก้ไข"><br>
+                  <button type="button" class="remove-img-btn" onclick="clearAfterImage()">✕ ลบรูปภาพนี้</button>
+                </div>
               </div>
             </div>
           </div>
           <div class="button-row">
             <button type="button" class="btn btn-secondary" id="clearCorrectionBtn">ล้างฟอร์ม</button>
-            <button type="submit" class="btn btn-primary" id="saveCorrectionBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>ยืนยันบันทึกผลการแก้ไข</button>
+            <button type="submit" class="btn btn-primary" id="saveCorrectionBtn">✓ ยืนยันบันทึกผลการแก้ไข</button>
           </div>
         </form>
       </div>
     </section>
 
+    <!-- ================= 5. ACTIVITY HISTORY ================= -->
     <section class="section" id="page-history">
       <div class="history-stats">
-        <div class="history-stat-card"><div class="history-stat-label">กิจกรรมทั้งหมด</div><div class="history-stat-value" id="historyTotal">-</div></div>
-        <div class="history-stat-card"><div class="history-stat-label">การบันทึกความเสี่ยง</div><div class="history-stat-value" id="historyReportTotal">-</div></div>
-        <div class="history-stat-card"><div class="history-stat-label">การบันทึกผลแก้ไข</div><div class="history-stat-value" id="historyCorrectionTotal">-</div></div>
+        <div class="history-stat-card">
+          <div class="history-stat-label">กิจกรรมทั้งหมด</div>
+          <div class="history-stat-value" id="historyTotal">-</div>
+        </div>
+        <div class="history-stat-card">
+          <div class="history-stat-label">การบันทึกความเสี่ยง</div>
+          <div class="history-stat-value" id="historyReportTotal">-</div>
+        </div>
+        <div class="history-stat-card">
+          <div class="history-stat-label">การบันทึกผลแก้ไข</div>
+          <div class="history-stat-value" id="historyCorrectionTotal">-</div>
+        </div>
       </div>
+
       <div class="card">
         <div class="list-toolbar">
-          <div><h2 class="card-title">ประวัติการดำเนินงาน (Activity Log)</h2><div class="card-description" style="margin-bottom:0">บันทึกทุกความเคลื่อนไหวในระบบแบบเรียลไทม์</div></div>
+          <div>
+            <h2 class="card-title">ประวัติการดำเนินงาน (Activity Log)</h2>
+            <div class="card-description" style="margin-bottom:0">บันทึกทุกความเคลื่อนไหวในระบบแบบเรียลไทม์</div>
+          </div>
           <button type="button" class="btn btn-secondary btn-small" id="refreshHistoryBtn">↻ โหลดใหม่</button>
         </div>
+
         <div id="historyMessage" class="message"></div>
+
         <div class="history-filter-grid">
-          <div class="filter-group"><label for="historySearch">ค้นหาประวัติ</label><input type="search" id="historySearch" placeholder="ค้นหารหัสรายงาน, ผู้ดำเนินการ, พื้นที่..."></div>
-          <div class="filter-group"><label for="historyTypeFilter">ประเภทกิจกรรม</label><select id="historyTypeFilter"><option value="">ทุกประเภท</option><option value="report">การบันทึกความเสี่ยง</option><option value="correction">การบันทึกผลการแก้ไข</option></select></div>
+          <div class="filter-group">
+            <label for="historySearch">ค้นหาประวัติ</label>
+            <input type="search" id="historySearch" placeholder="ค้นหารหัสรายงาน, ผู้ดำเนินการ, พื้นที่...">
+          </div>
+          <div class="filter-group">
+            <label for="historyTypeFilter">ประเภทกิจกรรม</label>
+            <select id="historyTypeFilter">
+              <option value="">ทุกประเภท</option>
+              <option value="report">การบันทึกความเสี่ยง</option>
+              <option value="correction">การบันทึกผลการแก้ไข</option>
+            </select>
+          </div>
         </div>
+
         <div class="report-result-count" id="historyResultCount">กำลังโหลดประวัติ...</div>
-        <div class="history-list" id="historyList"><div class="skeleton-box"></div><div class="skeleton-box"></div></div>
+        <div class="history-list" id="historyList"><div class="empty-state">กำลังโหลดประวัติการดำเนินงาน...</div></div>
       </div>
     </section>
+
   </main>
 </div>
+
 <script>
-  const BRAND_CONFIG = { systemName: "SafeTrack", companyName: "บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์", logoUrl: "logo.png" };
   const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwfZ1hQhjm-pUIN-rYqbby39a6Dy37pVdhRZiW1tL7BVgG0Z6_6sBDcx_PCvtx9titUdA/exec";
+
+  const BRAND_CONFIG = {
+    systemName: "SafeTrack",
+    companyName: "บมจ.อิตาเลียนไทย ดีเวล๊อปเมนต์"
+  };
 
   function callSafeTrackApi(action, payload = {}) {
     return fetch(GAS_API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: action, payload: payload })
-    }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+    }).then(response => {
+      if (!response.ok) throw new Error("การเชื่อมต่อเซิร์ฟเวอร์ขัดข้อง (HTTP " + response.status + ")");
+      return response.json();
+    });
   }
 
-  let areaData = [], userData = [], allRiskReports = [], filteredRiskReports = [];
-  let currentReportForPrint = null, selectedCorrectionReport = null, allHistoryData = [], dashboardSummaryCache = {};
-  const MAX_MULTI_IMAGES = 6;
-  let compressedImages = { beforeImage: [], afterImage: [] };
+  let areaData = [];
+  let userData = [];
+  let allRiskReports = [];
+  let filteredRiskReports = [];
+  let currentReportForPrint = null;
+  let selectedCorrectionReport = null;
+  let allHistoryData = [];
+  let beforeCompressedList = [];
+  let afterCompressedData = null;
 
   const pageInformation = {
     dashboard: { title: 'ภาพรวมระบบ', subtitle: 'สรุปสถิติและสถานะการจัดการความเสี่ยง' },
     'add-report': { title: 'เพิ่มรายงานความเสี่ยง', subtitle: 'บันทึกข้อมูลความเสี่ยงที่ตรวจพบในพื้นที่' },
-    reports: { title: 'รายการความเสี่ยง', subtitle: 'ค้นหา ดูรายละเอียด Before/After ส่งออก Excel และพิมพ์รายงาน' },
+    reports: { title: 'รายการความเสี่ยง', subtitle: 'ค้นหา ดูรายละเอียด Before/After และพิมพ์รายงาน' },
     corrections: { title: 'บันทึกผลการแก้ไข', subtitle: 'ตรวจสอบและบันทึกผลการแก้ไขความเสี่ยง' },
     history: { title: 'ประวัติการดำเนินงาน', subtitle: 'ติดตามประวัติการบันทึกและแก้ไขทั้งหมด' }
   };
 
   document.addEventListener('DOMContentLoaded', function () {
-    applyBrandConfig();
-    openUserGuideModal(false);
     setCurrentDateTime('reportDateTime');
     setCurrentDateTime('correctionDateTime');
+
     setupNavigation();
-    setupImageCompression('beforeImage', 'beforePreviewWrap', 'beforePreview', 'beforeImageHint');
-    setupImageCompression('afterImage', 'afterPreviewWrap', 'afterPreview', 'afterImageHint');
+    setupMultiBeforeImageUpload();
+    setupAfterImageUpload();
+
     loadMasterData();
     loadFullSystemData();
+    openUserGuideModal(false);
 
-    document.getElementById('dashboardMonthFilter').addEventListener('change', applyDashboardPeriodFilter);
-    document.getElementById('refreshDashboardBtn').addEventListener('click', () => loadFullSystemData(true));
+    document.getElementById('refreshDashboardBtn').addEventListener('click', loadFullSystemData);
     document.getElementById('printDashboardBtn').addEventListener('click', printDashboard);
-    document.getElementById('refreshReportsBtn').addEventListener('click', () => loadFullSystemData(true));
-    document.getElementById('refreshCorrectionBtn').addEventListener('click', () => loadFullSystemData(true));
-    document.getElementById('fabAddReport').addEventListener('click', () => switchPage('add-report'));
-    document.getElementById('closeReportDetailBtn').addEventListener('click', () => document.getElementById('allReportDetailCard').classList.add('form-hidden'));
+    document.getElementById('refreshReportsBtn').addEventListener('click', loadFullSystemData);
+    document.getElementById('refreshCorrectionBtn').addEventListener('click', loadFullSystemData);
+    document.getElementById('closeReportDetailBtn').addEventListener('click', () => {
+      document.getElementById('allReportDetailCard').classList.add('form-hidden');
+    });
+
     document.getElementById('reportSearch').addEventListener('input', filterRiskReports);
     document.getElementById('reportStatusFilter').addEventListener('change', filterRiskReports);
     document.getElementById('reportAreaFilter').addEventListener('change', filterRiskReports);
+
     document.getElementById('riskForm').addEventListener('submit', submitRiskReport);
     document.getElementById('correctionForm').addEventListener('submit', submitCorrection);
     document.getElementById('cancelCorrectionBtn').addEventListener('click', clearSelectedReport);
     document.getElementById('clearCorrectionBtn').addEventListener('click', () => resetCorrectionForm(true));
-    document.getElementById('resetRiskBtn').addEventListener('click', () => setTimeout(() => {
-      setCurrentDateTime('reportDateTime');
-      clearImageField('beforeImage', 'beforePreviewWrap', 'beforePreview', 'beforeImageHint');
-      updateAreaOptions();
-    }, 0));
+
+    document.getElementById('resetRiskBtn').addEventListener('click', function () {
+      setTimeout(() => {
+        setCurrentDateTime('reportDateTime');
+        beforeCompressedList = [];
+        renderBeforeMultiPreviews();
+        updateAreaOptions();
+      }, 0);
+    });
+
     document.getElementById('sectionSelect').addEventListener('change', updateAreaOptions);
-    document.getElementById('refreshHistoryBtn').addEventListener('click', () => loadActivityHistory(true));
+    document.getElementById('refreshHistoryBtn').addEventListener('click', loadActivityHistory);
     document.getElementById('historySearch').addEventListener('input', filterActivityHistory);
     document.getElementById('historyTypeFilter').addEventListener('change', filterActivityHistory);
   });
 
-  function applyBrandConfig() {
-    document.title = `${BRAND_CONFIG.systemName} | ${BRAND_CONFIG.companyName}`;
-    ['desktopSystemName', 'mobileSystemName'].forEach(id => document.getElementById(id).textContent = BRAND_CONFIG.systemName);
-    ['desktopCompanyName', 'mobileCompanyName', 'topbarCompanyName'].forEach(id => document.getElementById(id).textContent = BRAND_CONFIG.companyName);
-    document.getElementById('sidebarFooterText').innerHTML = `<strong>${escapeHtml(BRAND_CONFIG.companyName)}</strong><br>ระบบจัดการความปลอดภัยในการทำงาน`;
-    const fallbackSvg = `<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="44" fill="none" stroke="#f39200" stroke-width="7"/><path d="M50 18 A32 32 0 0 1 50 82" fill="none" stroke="#f39200" stroke-width="7"/><line x1="25" y1="34" x2="25" y2="66" stroke="#f39200" stroke-width="7"/><line x1="36" y1="34" x2="64" y2="34" stroke="#f39200" stroke-width="7"/><line x1="50" y1="34" x2="50" y2="70" stroke="#f39200" stroke-width="7"/></svg>`;
-    const logoHtml = BRAND_CONFIG.logoUrl ? `<img src="${escapeHtml(BRAND_CONFIG.logoUrl)}" alt="ITD Logo" onerror="this.parentElement.innerHTML=\`${fallbackSvg.replace(/"/g, "'")}\`">` : fallbackSvg;
-    document.getElementById('desktopLogoContainer').innerHTML = logoHtml;
-    document.getElementById('mobileLogoContainer').innerHTML = logoHtml;
-  }
-
-  function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const iconSvg = type === 'error'
-      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
-      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-    toast.innerHTML = `${iconSvg}<span>${escapeHtml(message)}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 260); }, 3200);
-  }
-
-  function getHazardBadgeHtml(category) {
-    const cat = String(category || '');
-    let cls = '';
-    if (cat.includes('ความปลอดภัย')) cls = 'haz-safety';
-    else if (cat.includes('กายภาพ')) cls = 'haz-physical';
-    else if (cat.includes('เคมี')) cls = 'haz-chemical';
-    else if (cat.includes('ชีวภาพ')) cls = 'haz-biological';
-    else if (cat.includes('การยศาสตร์')) cls = 'haz-ergonomic';
-    else if (cat.includes('จิตสังคม')) cls = 'haz-psychosocial';
-    return `<span class="tag ${cls}"><span>${escapeHtml(cat)}</span></span>`;
-  }
-
-  function setupNavigation() {
-    document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => switchPage(btn.dataset.page)));
-  }
-
-  function switchPage(page) {
-    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
-    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-    const target = document.getElementById('page-' + page);
-    if (target) target.classList.add('active');
-    const fab = document.getElementById('fabAddReport');
-    if (fab) fab.classList.toggle('hidden', page === 'add-report');
-    const info = pageInformation[page];
-    if (info) { document.getElementById('pageTitle').textContent = info.title; document.getElementById('pageSubtitle').textContent = info.subtitle; }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (page === 'history' && allHistoryData.length === 0) loadActivityHistory(false);
-  }
-
-  function loadMasterData() {
-    callSafeTrackApi('getInitialMasterData').then(res => {
-      if (!res || !res.success) return;
-      areaData = res.areas || [];
-      userData = res.users || [];
-      const datalist = document.getElementById('userListDatalist');
-      if (datalist) {
-        datalist.innerHTML = '';
-        userData.forEach(item => { if (item.fullName) { const opt = document.createElement('option'); opt.value = item.fullName; datalist.appendChild(opt); } });
-      }
-      const sections = [...new Set(areaData.map(a => a.section).filter(Boolean))];
-      const sectionSelect = document.getElementById('sectionSelect');
-      sectionSelect.innerHTML = '<option value="">เลือกพื้นที่หลัก</option>';
-      sections.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.textContent = sec; sectionSelect.appendChild(opt); });
-      populateReportAreaFilter();
-    }).catch(err => console.error(err));
-  }
-
-  function updateAreaOptions() {
-    const section = document.getElementById('sectionSelect').value;
-    const areaSelect = document.getElementById('areaSelect');
-    areaSelect.innerHTML = '<option value="">เลือกพื้นที่ย่อย</option>';
-    areaData.filter(a => a.section === section).forEach(area => { const opt = document.createElement('option'); opt.value = area.areaId; opt.textContent = area.areaName; areaSelect.appendChild(opt); });
-  }
-
-  function loadFullSystemData(notify = false) {
-    hideBoxMessage('dashboardMessage'); hideBoxMessage('reportsMessage'); hideBoxMessage('correctionListMessage');
-    callSafeTrackApi('getSafeTrackFullDataset').then(res => {
-      if (!res || !res.success) {
-        const errMsg = (res && res.message) || 'ไม่สามารถโหลดข้อมูลได้';
-        showBoxMessage('dashboardMessage', errMsg, 'error'); showBoxMessage('reportsMessage', errMsg, 'error');
-        return;
-      }
-      allRiskReports = Array.isArray(res.reports) ? res.reports : [];
-      dashboardSummaryCache = res.summary || {};
-      const pendingCount = Number(dashboardSummaryCache.pendingReports || 0);
-      const badge = document.getElementById('pendingNavBadge');
-      badge.textContent = pendingCount;
-      badge.classList.toggle('show', pendingCount > 0);
-      populateDashboardMonthFilter(allRiskReports);
-      applyDashboardPeriodFilter();
-      populateReportAreaFilter();
-      filterRiskReports();
-      renderCorrectionReports(allRiskReports.filter(r => r.status === 'บันทึกความเสี่ยงแล้ว'));
-      if (notify) showToast('อัปเดตข้อมูลล่าสุดเรียบร้อยแล้ว');
-    }).catch(err => {
-      const msg = 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + getErrorMessage(err);
-      showBoxMessage('dashboardMessage', msg, 'error'); showBoxMessage('reportsMessage', msg, 'error');
-    });
-  }
-
-  function getMonthKeyFromDate(d) { return d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : ''; }
-
-  function populateDashboardMonthFilter(reports) {
-    const select = document.getElementById('dashboardMonthFilter');
-    if (!select) return;
-    const prevValue = select.value || 'ALL';
-    const monthMap = new Map();
-    reports.forEach(r => {
-      const d = parseThaiDate(r.reportDateTime);
-      if (d) {
-        const key = getMonthKeyFromDate(d);
-        if (!monthMap.has(key)) monthMap.set(key, { key, label: d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }), count: 0 });
-        monthMap.get(key).count++;
-      }
-    });
-    const sortedMonths = Array.from(monthMap.values()).sort((a, b) => b.key.localeCompare(a.key));
-    select.innerHTML = `<option value="ALL">📊 ภาพรวมทั้งหมด (สะสม ${reports.length} รายการ)</option>`;
-    sortedMonths.forEach(m => { const opt = document.createElement('option'); opt.value = m.key; opt.textContent = `📅 เดือน ${m.label} (${m.count} รายการ)`; select.appendChild(opt); });
-    select.value = (prevValue === 'ALL' || monthMap.has(prevValue)) ? prevValue : 'ALL';
-  }
-
-  function applyDashboardPeriodFilter() {
-    const select = document.getElementById('dashboardMonthFilter');
-    const selectedMonth = select ? select.value : 'ALL';
-    const isAllPeriod = (selectedMonth === 'ALL');
-    const targetReports = isAllPeriod ? allRiskReports : allRiskReports.filter(r => { const d = parseThaiDate(r.reportDateTime); return d && getMonthKeyFromDate(d) === selectedMonth; });
-    const total = targetReports.length;
-    const completed = targetReports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
-    document.getElementById('totalReports').textContent = total.toLocaleString('th-TH');
-    document.getElementById('pendingReports').textContent = (total - completed).toLocaleString('th-TH');
-    document.getElementById('completedReports').textContent = completed.toLocaleString('th-TH');
-
-    if (isAllPeriod) {
-      document.getElementById('totalReportsNote').textContent = 'จำนวนรายงานสะสมทั้งหมด';
-      document.getElementById('activeAreasLabel').textContent = 'พื้นที่ที่ใช้งาน';
-      document.getElementById('activeAreasNote').textContent = 'พื้นที่เปิดใช้งานในระบบ';
-      document.getElementById('activeAreas').textContent = Number(dashboardSummaryCache.activeAreas || 0).toLocaleString('th-TH');
-      document.getElementById('dashboardLatestTitle').textContent = 'รายการความเสี่ยงล่าสุด 10 รายการ';
-    } else {
-      const optText = select.options[select.selectedIndex].text.replace(/^📅\s*/, '').replace(/\s*\(\d+.*\)$/, '');
-      const distinctAreas = new Set(targetReports.map(r => [r.section, r.areaName].filter(Boolean).join('/')).filter(Boolean)).size;
-      document.getElementById('totalReportsNote').textContent = `รายงานใน${optText}`;
-      document.getElementById('activeAreasLabel').textContent = 'พื้นที่ที่พบความเสี่ยง';
-      document.getElementById('activeAreasNote').textContent = `พบจุดเสี่ยงใน${optText}`;
-      document.getElementById('activeAreas').textContent = distinctAreas.toLocaleString('th-TH');
-      document.getElementById('dashboardLatestTitle').textContent = `รายการความเสี่ยงใน${optText} (${total} รายการ)`;
-    }
-    renderDashboardAnalytics(targetReports, allRiskReports);
-  }
-
-  function renderMultiImagePreviews(inputId, wrapId, hintId) {
-    const wrap = document.getElementById(wrapId);
-    const hintEl = document.getElementById(hintId);
-    const list = compressedImages[inputId] || [];
-    if (!list.length) {
-      wrap.innerHTML = ''; wrap.style.display = 'none';
-      hintEl.textContent = `รองรับภาพจากกล้องมือถือ (สูงสุด ${MAX_MULTI_IMAGES} รูป) ระบบจะปรับขนาดให้อัตโนมัติ`;
-      return;
-    }
-    wrap.style.display = 'grid';
-    wrap.classList.add('multi-preview-grid');
-    wrap.innerHTML = list.map((item, idx) => `
-      <div class="multi-preview-item">
-        <img src="${escapeHtml(item.dataUrl)}" alt="รูปที่ ${idx + 1}" onclick="openImageLightbox('${escapeHtml(item.dataUrl)}', 'รูปที่ ${idx + 1} (${escapeHtml(item.fileName)})')">
-        <button type="button" class="multi-remove-btn" onclick="removeSingleImage('${inputId}', '${wrapId}', '${hintId}', ${idx})">✕ ลบรูป ${idx + 1}</button>
-      </div>
-    `).join('');
-    const totalKb = list.reduce((sum, item) => sum + Math.round((item.dataUrl.length * 3) / 4 / 1024), 0);
-    hintEl.textContent = `เลือกแล้ว ${list.length} / ${MAX_MULTI_IMAGES} รูป (ขนาดรวม ~${totalKb} KB)`;
-  }
-
-  function removeSingleImage(inputId, wrapId, hintId, indexToRemove) {
-    compressedImages[inputId] = (compressedImages[inputId] || []).filter((_, idx) => idx !== indexToRemove);
-    if (compressedImages[inputId].length === 0) document.getElementById(inputId).value = '';
-    renderMultiImagePreviews(inputId, wrapId, hintId);
-  }
-
-  function compressSingleFile(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          const MAX = 1280;
-          let width = img.width, height = img.height;
-          if (width > MAX || height > MAX) {
-            if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
-            else { width = Math.round(width * MAX / height); height = MAX; }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width; canvas.height = height;
-          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-          resolve({ fileName: file.name, dataUrl: canvas.toDataURL('image/jpeg', 0.8) });
-        };
-        img.onerror = reject; img.src = e.target.result;
-      };
-      reader.onerror = reject; reader.readAsDataURL(file);
-    });
-  }
-
-  function setupImageCompression(inputId, wrapId, _previewId, hintId) {
-    const input = document.getElementById(inputId);
-    input.setAttribute('multiple', 'multiple');
-    input.addEventListener('change', async function () {
-      const files = Array.from(input.files || []);
-      if (!files.length) return;
-      const validFiles = files.filter(f => f.type.startsWith('image/'));
-      if (validFiles.length !== files.length) showToast('ข้ามไฟล์ที่ไม่ใช่รูปภาพออกให้อัตโนมัติ', 'error');
-      const currentList = compressedImages[inputId] || [];
-      const availableSlots = MAX_MULTI_IMAGES - currentList.length;
-      if (availableSlots <= 0) { showToast(`แนบรูปได้สูงสุด ${MAX_MULTI_IMAGES} รูปต่อครั้ง`, 'error'); input.value = ''; return; }
-      const filesToProcess = validFiles.slice(0, availableSlots);
-      if (validFiles.length > availableSlots) showToast(`เลือกได้เพิ่มอีก ${availableSlots} รูป (จำกัดสูงสุด ${MAX_MULTI_IMAGES} รูป)`, 'error');
-      document.getElementById(hintId).textContent = `กำลังปรับขนาดรูปภาพ ${filesToProcess.length} รูป...`;
-      try {
-        const processed = await Promise.all(filesToProcess.map(compressSingleFile));
-        compressedImages[inputId] = [...currentList, ...processed];
-        renderMultiImagePreviews(inputId, wrapId, hintId);
-      } catch (err) {
-        showToast('เกิดข้อผิดพลาดในการย่อขนาดรูปภาพ', 'error');
-        renderMultiImagePreviews(inputId, wrapId, hintId);
-      }
-      input.value = '';
-    });
-  }
-
-  function clearImageField(inputId, wrapId, _previewId, hintId) {
-    document.getElementById(inputId).value = '';
-    compressedImages[inputId] = [];
-    renderMultiImagePreviews(inputId, wrapId, hintId);
-  }
-
-  function dataUrlToFile(dataUrl, fileName) {
-    const arr = dataUrl.split(',');
-    const mimeMatch = arr[0].match(/:(.*?);/);
-    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
-    return new File([u8arr], fileName, { type: mime });
-  }
-
-  function submitRiskReport(event) {
-    event.preventDefault();
-    const btn = document.getElementById('saveRiskBtn');
-    hideBoxMessage('formMessage');
-    btn.disabled = true; btn.textContent = 'กำลังบันทึกข้อมูล...';
-    const attachedImages = (compressedImages.beforeImage || []).map(item => ({ ...item }));
-    const firstImage = attachedImages[0] || null;
-
-    const payload = {
-      reportDateTime: document.getElementById('reportDateTime').value,
-      reporter: document.getElementById('reporterSelect').value.trim(),
-      areaId: document.getElementById('areaSelect').value,
-      locationDetail: document.getElementById('locationDetail').value.trim(),
-      hazardCategory: document.getElementById('hazardCategory').value,
-      unsafeCondition: document.getElementById('unsafeCondition').value.trim(),
-      potentialIncident: document.getElementById('potentialIncident').value.trim(),
-      longTermControl: document.getElementById('longTermControl').value.trim(),
-      supervisor: document.getElementById('supervisorSelect').value.trim(),
-      beforeImage: firstImage,
-      beforeImages: attachedImages
-    };
-
-    callSafeTrackApi('saveRiskReport', payload).then(res => {
-      btn.disabled = false;
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกรายงานความเสี่ยง`;
-      if (res && res.success) {
-        showToast('บันทึกรายงาน ' + res.reportId + ' สำเร็จ!');
-        showBoxMessage('formMessage', '✓ ' + res.message + ' (' + res.reportId + ')', 'success');
-        document.getElementById('riskForm').reset();
-        clearImageField('beforeImage', 'beforePreviewWrap', 'beforePreview', 'beforeImageHint');
-        setCurrentDateTime('reportDateTime');
-        updateAreaOptions();
-        loadFullSystemData(false);
-        allHistoryData = [];
-        if (res.summaryForLine) openLineShareModal('report', res.summaryForLine, firstImage);
-      } else {
-        showBoxMessage('formMessage', (res && res.message) || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
-      }
-    }).catch(err => {
-      btn.disabled = false; btn.textContent = 'บันทึกรายงานความเสี่ยง';
-      showBoxMessage('formMessage', 'เกิดข้อผิดพลาด: ' + getErrorMessage(err), 'error');
-    });
-  }
-
-  function openLineShareModal(type, info, localImageObj = null) {
-    const existing = document.getElementById('lineShareBackdrop');
-    if (existing) existing.remove();
-    const messageText = type === 'report'
-      ? `⚠️ [แจ้งพบความเสี่ยง - ${BRAND_CONFIG.companyName}]\nรหัส: ${info.reportId}\nวันที่/เวลา: ${info.reportDateTime}\nพื้นที่: ${info.areaText}\nจุดที่พบ: ${info.locationDetail}\nประเภท: ${info.hazardCategory}\nรายละเอียด: ${info.unsafeCondition}\nผู้รับผิดชอบ: ${info.supervisor}\nผู้รายงาน: ${info.reporter}` + (info.imageUrl ? `\nภาพประกอบ: ${info.imageUrl}` : '')
-      : `✅ [แจ้งผลการแก้ไขแล้ว - ${BRAND_CONFIG.companyName}]\nรหัส: ${info.reportId}\nวันที่แก้ไข: ${info.correctionDateTime}\nพื้นที่: ${info.areaText} (${info.locationDetail})\nผลการแก้ไข: ${info.correctionDetail}\nผู้ดำเนินการแก้ไข: ${info.correctedBy}\nผู้ตรวจสอบ (จป.): ${info.recordedBy}` + (info.imageUrl ? `\nภาพหลังแก้ไข: ${info.imageUrl}` : '');
-
-    const backdrop = document.createElement('div');
-    backdrop.className = 'modal-backdrop'; backdrop.id = 'lineShareBackdrop';
-    const box = document.createElement('div');
-    box.className = 'modal-box';
-    const hasImageFile = Boolean(localImageObj && localImageObj.dataUrl);
-
-    box.innerHTML = `
-      <div class="modal-header">
-        <h3 class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06c755" stroke-width="2.3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>สรุปข้อความแจ้งกลุ่ม LINE</h3>
-        <button type="button" class="modal-close" onclick="document.getElementById('lineShareBackdrop').remove()">×</button>
-      </div>
-      ${hasImageFile ? `<div class="line-tip-box">💡 <strong>วิธีส่งรูปขึ้นแชท LINE ทันที:</strong> กดปุ่มสีส้มด้านล่าง ระบบจะคัดลอกข้อความให้อัตโนมัติพร้อมเปิดหน้าแชร์รูปภาพ ให้เลือกแอป LINE &gt; ส่งรูป &gt; แล้วกด <strong>วาง (Paste)</strong> ข้อความตามเข้าไปได้เลยครับ</div>` : ''}
-      <div class="line-preview-box" id="lineShareText"></div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('lineShareBackdrop').remove()">ปิดหน้าต่าง</button>
-        <button type="button" class="btn btn-primary" id="copyLineTextBtn">📋 คัดลอกข้อความ</button>
-        ${hasImageFile ? `<button type="button" class="btn btn-orange" id="shareImageLineBtn">📲 ส่งรูปภาพ + คัดลอกข้อความเข้า LINE</button>` : ''}
-        <a class="btn btn-line" style="text-decoration:none;" target="_blank" rel="noopener noreferrer" href="https://line.me/R/msg/text/?${encodeURIComponent(messageText)}">ส่งเฉพาะข้อความเข้า LINE ↗</a>
-      </div>
-    `;
-    backdrop.appendChild(box); document.body.appendChild(backdrop);
-    document.getElementById('lineShareText').textContent = messageText;
-
-    const copyTextHelper = () => {
-      if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(messageText).catch(() => {});
-      const ta = document.createElement('textarea'); ta.value = messageText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-      return Promise.resolve();
-    };
-
-    document.getElementById('copyLineTextBtn').addEventListener('click', function () {
-      const btn = this;
-      copyTextHelper().then(() => { showToast('คัดลอกข้อความลงคลิปบอร์ดแล้ว'); btn.textContent = '✓ คัดลอกแล้ว!'; setTimeout(() => { btn.textContent = '📋 คัดลอกข้อความ'; }, 2000); });
-    });
-
-    if (hasImageFile) {
-      document.getElementById('shareImageLineBtn').addEventListener('click', async function () {
-        await copyTextHelper();
-        showToast('คัดลอกข้อความแล้ว กำลังเปิดหน้าต่างส่งรูปภาพ...');
-        try {
-          const imgFile = dataUrlToFile(localImageObj.dataUrl, (info.reportId || 'safetrack') + '.jpg');
-          if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
-            await navigator.share({ files: [imgFile], title: 'รายงาน SafeTrack ' + (info.reportId || '') });
-          } else {
-            const a = document.createElement('a'); a.href = localImageObj.dataUrl; a.download = (info.reportId || 'safetrack') + '.jpg'; a.click();
-            window.open('https://line.me/R/msg/text/?' + encodeURIComponent(messageText), '_blank');
-          }
-        } catch (err) {
-          if (err && err.name !== 'AbortError') window.open('https://line.me/R/msg/text/?' + encodeURIComponent(messageText), '_blank');
-        }
-      });
-    }
-  }
-
-  function shareCurrentReportToLine() {
-    if (!currentReportForPrint) return;
-    const r = currentReportForPrint;
-    const corrections = Array.isArray(r.corrections) ? r.corrections : [];
-    const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : null;
-    const areaText = [r.section, r.areaName].filter(Boolean).join(' / ');
-    if (r.status === 'แจ้งผลการแก้ไขแล้ว' && latestCorr) {
-      openLineShareModal('correction', { reportId: r.reportId, correctionDateTime: latestCorr.correctionDateTime, areaText, locationDetail: r.locationDetail, correctionDetail: latestCorr.correctionDetail, correctedBy: latestCorr.correctedBy, recordedBy: latestCorr.recordedBy, imageUrl: latestCorr.afterImageUrl || '' });
-    } else {
-      openLineShareModal('report', { reportId: r.reportId, reportDateTime: r.reportDateTime, areaText, locationDetail: r.locationDetail, hazardCategory: r.hazardCategory, unsafeCondition: r.unsafeCondition, supervisor: r.supervisor || '-', reporter: r.reporter, imageUrl: r.beforeImageUrl || '' });
-    }
-  }
-
-  function exportReportsToExcel() {
-    const targetList = (Array.isArray(filteredRiskReports) && filteredRiskReports.length > 0) ? filteredRiskReports : allRiskReports;
-    if (!targetList || targetList.length === 0) { showToast('ไม่มีข้อมูลรายการความเสี่ยงให้ส่งออก', 'error'); return; }
-    const headers = ['รหัสรายงาน', 'วันและเวลาที่พบ', 'พื้นที่หลัก (Section)', 'พื้นที่ย่อย', 'ตำแหน่งที่พบความเสี่ยง', 'ประเภทอันตราย', 'สภาพการณ์ที่ไม่ปลอดภัย', 'อุบัติเหตุที่อาจเกิดขึ้น', 'แนวทางควบคุมระยะยาว', 'ผู้รายงาน', 'ผู้รับผิดชอบ', 'สถานะปัจจุบัน', 'วันและเวลาแก้ไข', 'ผู้ดำเนินการแก้ไข', 'รายละเอียดผลการแก้ไข', 'ผู้ตรวจสอบ (จป.)', 'ลิงก์ภาพก่อนแก้ไข', 'ลิงก์ภาพหลังแก้ไข'];
-    const dataRows = targetList.map(r => {
-      const corrections = Array.isArray(r.corrections) ? r.corrections : [];
-      const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : {};
-      return [r.reportId || '', r.reportDateTime || '', r.section || '', r.areaName || '', r.locationDetail || '', r.hazardCategory || '', r.unsafeCondition || '', r.potentialIncident || '', r.longTermControl || '', r.reporter || '', r.supervisor || '', r.status || '', latestCorr.correctionDateTime || '', latestCorr.correctedBy || '', latestCorr.correctionDetail || '', latestCorr.recordedBy || '', r.beforeImageUrl || '', latestCorr.afterImageUrl || ''];
-    });
-    const now = new Date();
-    const dateStamp = `${now.getFullYear() + 543}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    if (typeof XLSX !== 'undefined') {
-      const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
-      ws['!cols'] = headers.map((h, colIdx) => {
-        let maxLen = String(h).length;
-        dataRows.forEach(row => { const firstLine = String(row[colIdx] || '').split('\n')[0]; if (firstLine.length > maxLen) maxLen = firstLine.length; });
-        return { wch: Math.min(Math.max(maxLen + 6, 15), 48) };
-      });
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'รายการความเสี่ยง');
-      XLSX.writeFile(wb, `SafeTrack_Report_${dateStamp}.xlsx`);
-      showToast(`ดาวน์โหลดไฟล์ Excel (.xlsx) จำนวน ${targetList.length} รายการ สำเร็จ!`);
-    } else {
-      const escapeCsv = val => `"${String(val == null ? '' : val).replace(/"/g, '""')}"`;
-      const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...dataRows.map(row => row.map(escapeCsv).join(','))].join('\r\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a'); link.href = url; link.download = `SafeTrack_Report_${dateStamp}.csv`;
-      document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
-      showToast(`ดาวน์โหลดไฟล์ตารางข้อมูล (${targetList.length} รายการ) สำเร็จ!`);
-    }
-  }
-
-  function openImageLightbox(imgSrc, captionText) {
-    if (!imgSrc) return;
-    const old = document.getElementById('imageLightboxBackdrop');
-    if (old) old.remove();
-    const div = document.createElement('div');
-    div.className = 'lightbox-backdrop'; div.id = 'imageLightboxBackdrop'; div.onclick = () => div.remove();
-    div.innerHTML = `<img class="lightbox-img" src="${escapeHtml(imgSrc)}" alt="ขยายภาพ"><div class="lightbox-caption">${escapeHtml(captionText || 'คลิกที่ว่างเพื่อปิดภาพขยาย')}</div>`;
-    document.body.appendChild(div);
-  }
-
-  function populateReportAreaFilter() {
-    const select = document.getElementById('reportAreaFilter');
-    const prev = select.value;
-    select.innerHTML = '<option value="">ทุกพื้นที่</option>';
-    const sections = [...new Set([...areaData.map(a => a.section), ...allRiskReports.map(r => r.section)].filter(Boolean))];
-    sections.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.textContent = sec; select.appendChild(opt); });
-    if (sections.includes(prev)) select.value = prev;
-  }
-
-  function filterRiskReports() {
-    const kw = document.getElementById('reportSearch').value.trim().toLowerCase();
-    const status = document.getElementById('reportStatusFilter').value;
-    const section = document.getElementById('reportAreaFilter').value;
-    filteredRiskReports = allRiskReports.filter(r => {
-      const text = [r.reportId, r.reporter, r.locationDetail, r.hazardCategory, r.unsafeCondition, r.areaName, r.section].join(' ').toLowerCase();
-      return (!kw || text.includes(kw)) && (!status || r.status === status) && (!section || r.section === section);
-    });
-    renderAllRiskReports();
-  }
-
-  function renderAllRiskReports() {
-    const list = document.getElementById('allReportsList');
-    const count = document.getElementById('reportResultCount');
-    list.innerHTML = '';
-    count.textContent = `แสดง ${filteredRiskReports.length.toLocaleString('th-TH')} รายการ จากทั้งหมด ${allRiskReports.length.toLocaleString('th-TH')} รายการ`;
-    if (filteredRiskReports.length === 0) { list.innerHTML = `<div class="empty-state">ไม่พบรายการที่ตรงกับเงื่อนไข</div>`; return; }
-
-    filteredRiskReports.forEach(report => {
-      const isCompleted = report.status === 'แจ้งผลการแก้ไขแล้ว';
-      const thumbUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w240');
-      const fullImgUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w1000');
-      const card = document.createElement('div');
-      card.className = 'report-card';
-      card.innerHTML = `
-        <div class="report-card-main">
-          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onclick="openImageLightbox('${escapeHtml(fullImgUrl)}', '${escapeHtml(report.reportId)}')" onerror="this.style.display='none'">` : ''}
-          <div class="report-card-body">
-            <div class="report-id">${escapeHtml(report.reportId)}</div>
-            <div class="report-location">${escapeHtml(report.locationDetail || 'ไม่ระบุตำแหน่ง')}</div>
-            <div class="report-meta">
-              <span class="meta-item">📅 ${escapeHtml(report.reportDateTime)}</span>
-              <span class="meta-item">📍 ${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</span>
-              <span class="meta-item">👤 ${escapeHtml(report.reporter)}</span>
-            </div>
-            ${getHazardBadgeHtml(report.hazardCategory)}
-            <div class="report-description">${escapeHtml(report.unsafeCondition)}</div>
-          </div>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
-          <span class="report-status ${isCompleted ? 'completed' : 'pending'}">${escapeHtml(report.status)}</span>
-          <button type="button" class="btn btn-primary btn-small view-detail-btn">ดูรายละเอียด</button>
-        </div>
-      `;
-      card.querySelector('.view-detail-btn').addEventListener('click', () => showAllReportDetail(report));
-      list.appendChild(card);
-    });
-  }
-
-  function showAllReportDetail(report) {
-    currentReportForPrint = report;
-    const container = document.getElementById('allReportDetail');
-    const isCompleted = report.status === 'แจ้งผลการแก้ไขแล้ว';
-    const corrections = Array.isArray(report.corrections) ? report.corrections : [];
-    const latestCorrection = corrections.length > 0 ? corrections[corrections.length - 1] : null;
-    const correctionHtml = corrections.length === 0
-      ? `<div class="empty-state" style="padding:20px;">รายการนี้ยังอยู่ระหว่างรอดำเนินการแก้ไข</div>`
-      : corrections.map(c => `
-        <div class="detail-grid" style="margin-bottom:12px;">
-          <div class="detail-item"><div class="detail-label">วันและเวลาตรวจสอบแก้ไข</div><div class="detail-value">${escapeHtml(c.correctionDateTime)}</div></div>
-          <div class="detail-item"><div class="detail-label">ผู้ปฏิบัติงานแก้ไข (คนงาน)</div><div class="detail-value">${escapeHtml(c.correctedBy)}</div></div>
-          <div class="detail-item"><div class="detail-label">ผู้ตรวจสอบและบันทึกผล (จป.)</div><div class="detail-value">${escapeHtml(c.recordedBy)}</div></div>
-          <div class="detail-item"><div class="detail-label">ประเภทหลักฐาน</div><div class="detail-value">${escapeHtml(c.evidenceType)}</div></div>
-          <div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">รายละเอียดผลการแก้ไข</div><div class="detail-value">${escapeHtml(c.correctionDetail)}</div></div>
-        </div>
-      `).join('');
-
-    container.innerHTML = `
-      <div style="margin-bottom:12px;"><span class="report-status ${isCompleted ? 'completed' : 'pending'}">${escapeHtml(report.status)}</span></div>
-      <div class="detail-section-title">1. ข้อมูลความเสี่ยงที่ตรวจพบ</div>
-      <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">รหัสรายงาน</div><div class="detail-value">${escapeHtml(report.reportId)}</div></div>
-        <div class="detail-item"><div class="detail-label">วันและเวลาที่พบ</div><div class="detail-value">${escapeHtml(report.reportDateTime)}</div></div>
-        <div class="detail-item"><div class="detail-label">ผู้รายงาน</div><div class="detail-value">${escapeHtml(report.reporter)}</div></div>
-        <div class="detail-item"><div class="detail-label">พื้นที่ปฏิบัติงาน</div><div class="detail-value">${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</div></div>
-        <div class="detail-item"><div class="detail-label">ตำแหน่งที่พบ</div><div class="detail-value">${escapeHtml(report.locationDetail)}</div></div>
-        <div class="detail-item"><div class="detail-label">ประเภทอันตราย</div><div class="detail-value">${escapeHtml(report.hazardCategory)}</div></div>
-        <div class="detail-item"><div class="detail-label">ผู้ควบคุมงาน / ผู้รับผิดชอบ</div><div class="detail-value">${escapeHtml(report.supervisor || '-')}</div></div>
-        <div class="detail-item"><div class="detail-label">สภาพการณ์ที่ไม่ปลอดภัย</div><div class="detail-value">${escapeHtml(report.unsafeCondition)}</div></div>
-        <div class="detail-item"><div class="detail-label">อุบัติเหตุที่อาจเกิดขึ้น</div><div class="detail-value">${escapeHtml(report.potentialIncident)}</div></div>
-        <div class="detail-item"><div class="detail-label">แนวทางควบคุมระยะยาว</div><div class="detail-value">${escapeHtml(report.longTermControl || '-')}</div></div>
-      </div>
-      <div class="detail-section-title">2. ผลการดำเนินการแก้ไข</div>
-      ${correctionHtml}
-      <div class="detail-section-title">3. ภาพถ่ายเปรียบเทียบ (Before / After)</div>
-      <div class="ba-image-grid">
-        <div class="ba-image-card"><span class="ba-badge before">ก่อนแก้ไข (Before)</span>${renderDriveImageHtml(report.beforeImageFileId, report.beforeImageUrl, 'ภาพก่อนแก้ไข')}</div>
-        <div class="ba-image-card"><span class="ba-badge after">หลังแก้ไข (After)</span>${latestCorrection ? renderDriveImageHtml(latestCorrection.afterImageFileId, latestCorrection.afterImageUrl, 'ภาพหลังแก้ไข') : '<div class="detail-value" style="color:var(--muted);">ยังไม่มีภาพหลังแก้ไข</div>'}</div>
-      </div>
-    `;
-    const card = document.getElementById('allReportDetailCard');
-    card.classList.remove('form-hidden');
-    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function renderDriveImageHtml(fileId, url, altText) {
-    const imgSrc = getDriveDisplayUrl(fileId, url, 'w1000');
-    if (!imgSrc) return `<div class="detail-value" style="color:var(--muted); padding:20px 0;">ไม่มีภาพถ่ายแนบ</div>`;
-    return `
-      <img class="report-detail-image" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(altText)}" onclick="openImageLightbox('${escapeHtml(imgSrc)}', '${escapeHtml(altText)}')" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      <div style="display:none; font-size:12px; color:var(--muted); padding:10px 0;">ไม่สามารถแสดงตัวอย่างภาพได้ กรุณากดลิงก์ด้านล่าง</div>
-      <a class="before-image-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">เปิดดูภาพต้นฉบับใน Drive ↗</a>
-    `;
-  }
-
-  function getDriveDisplayUrl(fileId, url, size = 'w1000') {
-    let id = String(fileId || '').trim();
-    if (!id && url) {
-      const firstUrl = String(url).split(/[\n,]+/)[0].trim();
-      const match = firstUrl.match(/\/file\/d\/([^/]+)/) || firstUrl.match(/[?&]id=([^&]+)/);
-      if (match && match[1]) id = match[1];
-    }
-    return id ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=' + size) : (String(url || '').split(/[\n,]+/)[0].trim());
-  }
-
-  function renderCorrectionReports(pendingList) {
-    const list = document.getElementById('correctionReportList');
-    const count = document.getElementById('pendingCount');
-    list.innerHTML = '';
-    count.textContent = `รายการที่รอบันทึกผลการแก้ไข: ${pendingList.length} รายการ`;
-    if (pendingList.length === 0) { list.innerHTML = `<div class="empty-state">ไม่มีรายการความเสี่ยงที่รอบันทึกผลการแก้ไข</div>`; return; }
-
-    pendingList.forEach(report => {
-      const thumbUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w240');
-      const fullImgUrl = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w1000');
-      const card = document.createElement('div');
-      card.className = 'report-card';
-      card.innerHTML = `
-        <div class="report-card-main">
-          ${thumbUrl ? `<img class="report-thumb" src="${escapeHtml(thumbUrl)}" alt="รูปประกอบ" onclick="openImageLightbox('${escapeHtml(fullImgUrl)}', '${escapeHtml(report.reportId)}')" onerror="this.style.display='none'">` : ''}
-          <div class="report-card-body">
-            <div class="report-id">${escapeHtml(report.reportId)}</div>
-            <div class="report-location">${escapeHtml(report.locationDetail)}</div>
-            <div class="report-meta">
-              <span class="meta-item">📅 ${escapeHtml(report.reportDateTime)}</span>
-              <span class="meta-item">📍 ${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</span>
-            </div>
-            ${getHazardBadgeHtml(report.hazardCategory)}
-            <div class="report-description">${escapeHtml(report.unsafeCondition)}</div>
-          </div>
-        </div>
-        <button type="button" class="btn btn-primary btn-small select-corr-btn">เลือกบันทึกผล</button>
-      `;
-      card.querySelector('.select-corr-btn').addEventListener('click', () => selectReportForCorrection(report));
-      list.appendChild(card);
-    });
-  }
-
-  function selectReportForCorrection(report) {
-    selectedCorrectionReport = report;
-    document.getElementById('selectedReportDetail').innerHTML = `
-      <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">รหัสรายงาน</div><div class="detail-value">${escapeHtml(report.reportId)}</div></div>
-        <div class="detail-item"><div class="detail-label">วันและเวลาที่พบ</div><div class="detail-value">${escapeHtml(report.reportDateTime)}</div></div>
-        <div class="detail-item"><div class="detail-label">พื้นที่</div><div class="detail-value">${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</div></div>
-        <div class="detail-item"><div class="detail-label">ตำแหน่งที่พบ</div><div class="detail-value">${escapeHtml(report.locationDetail)}</div></div>
-        <div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">สภาพการณ์ที่ไม่ปลอดภัย</div><div class="detail-value">${escapeHtml(report.unsafeCondition)}</div></div>
-      </div>
-      ${report.beforeImageUrl ? `<a class="before-image-link" href="${escapeHtml(report.beforeImageUrl)}" target="_blank" rel="noopener noreferrer">เปิดดูภาพก่อนแก้ไข ↗</a>` : ''}
-    `;
-    document.getElementById('selectedReportCard').classList.remove('form-hidden');
-    document.getElementById('correctionFormCard').classList.remove('form-hidden');
-    resetCorrectionForm(true);
-    setCurrentDateTime('correctionDateTime');
-    document.getElementById('selectedReportCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function clearSelectedReport() {
-    selectedCorrectionReport = null;
-    document.getElementById('selectedReportCard').classList.add('form-hidden');
-    document.getElementById('correctionFormCard').classList.add('form-hidden');
-    resetCorrectionForm(true);
-  }
-
-  function resetCorrectionForm(clearMsg) {
-    document.getElementById('correctionForm').reset();
-    setCurrentDateTime('correctionDateTime');
-    clearImageField('afterImage', 'afterPreviewWrap', 'afterPreview', 'afterImageHint');
-    if (clearMsg) hideBoxMessage('correctionMessage');
-  }
-
-  function submitCorrection(event) {
-    event.preventDefault();
-    if (!selectedCorrectionReport) return showBoxMessage('correctionMessage', 'กรุณาเลือกรายการความเสี่ยงก่อน', 'error');
-    const btn = document.getElementById('saveCorrectionBtn');
-    hideBoxMessage('correctionMessage');
-    btn.disabled = true; btn.textContent = 'กำลังบันทึกผล...';
-    const attachedAfterImages = (compressedImages.afterImage || []).map(item => ({ ...item }));
-    const firstAfterImage = attachedAfterImages[0] || null;
-
-    const payload = {
-      reportId: selectedCorrectionReport.reportId,
-      correctionDateTime: document.getElementById('correctionDateTime').value,
-      correctedBy: document.getElementById('correctedBy').value.trim(),
-      correctionDetail: document.getElementById('correctionDetail').value.trim(),
-      recordedBy: document.getElementById('correctionRecordedBy').value.trim(),
-      afterImageDataUrl: firstAfterImage ? firstAfterImage.dataUrl : '',
-      afterImages: attachedAfterImages
-    };
-
-    callSafeTrackApi('saveCorrection', payload).then(res => {
-      btn.disabled = false;
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันบันทึกผลการแก้ไข`;
-      if (res && res.success) {
-        showToast('บันทึกผลการแก้ไขเรียบร้อยแล้ว!');
-        showBoxMessage('correctionMessage', '✓ ' + res.message, 'success');
-        clearSelectedReport();
-        loadFullSystemData(false);
-        allHistoryData = [];
-        if (res.summaryForLine) openLineShareModal('correction', res.summaryForLine, firstAfterImage);
-      } else {
-        showBoxMessage('correctionMessage', (res && res.message) || 'ไม่สามารถบันทึกผลการแก้ไขได้', 'error');
-      }
-    }).catch(err => {
-      btn.disabled = false; btn.textContent = 'ยืนยันบันทึกผลการแก้ไข';
-      showBoxMessage('correctionMessage', 'เกิดข้อผิดพลาด: ' + getErrorMessage(err), 'error');
-    });
-  }
-
-  function getPrintStyles() {
-    return `* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; } body { font-family: 'Sarabun', sans-serif; color: #1f2937; margin: 0; padding: 0; font-size: 10.5pt; line-height: 1.45; } @page { size: A4 portrait; margin: 12mm; } .report-page { page-break-after: always; break-after: page; } .report-page:last-child { page-break-after: auto; break-after: auto; } .doc-header { border-bottom: 2px solid #0e9f9a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; } .doc-header h1 { font-size: 15pt; color: #142b45; margin: 0; } .doc-company { font-size: 10.5pt; font-weight: 700; color: #475569; margin-bottom: 2px; } .doc-id { font-size: 10pt; font-weight: 700; color: #087d79; } .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 9pt; font-weight: 700; border: 1px solid #94a3b8; } h2 { font-size: 12pt; color: #142b45; background: #f1f5f9; padding: 5px 9px; border-left: 4px solid #0e9f9a; margin: 12px 0 8px; } table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 9.5pt; } th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; vertical-align: top; white-space: pre-wrap; } th { width: 26%; background: #f8fafc; color: #334155; font-weight: 700; } .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; break-inside: avoid; } .ba-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; text-align: center; } .ba-title { font-weight: 700; font-size: 9.5pt; margin-bottom: 6px; padding: 2px 8px; border-radius: 4px; display: inline-block; } .ba-before { background: #fee2e2; color: #b91c1c; } .ba-after { background: #dcfce7; color: #15803d; } .ba-box img { max-width: 100%; max-height: 220px; object-fit: contain; display: block; margin: 0 auto; } .muted { color: #64748b; font-size: 9pt; } .print-footer { margin-top: 12px; padding-top: 6px; border-top: 1px solid #cbd5e1; font-size: 8.5pt; color: #64748b; text-align: right; }`;
-  }
-
-  function buildSingleReportPrintHtml(report) {
-    const corrections = Array.isArray(report.corrections) ? report.corrections : [];
-    const latestCorr = corrections.length > 0 ? corrections[corrections.length - 1] : null;
-    const beforeImg = getDriveDisplayUrl(report.beforeImageFileId, report.beforeImageUrl, 'w1000');
-    const afterImg = latestCorr ? getDriveDisplayUrl(latestCorr.afterImageFileId, latestCorr.afterImageUrl, 'w1000') : '';
-    const corrRows = !latestCorr ? `<tr><td colspan="2" class="muted">ยังไม่มีข้อมูลการบันทึกผลการแก้ไข</td></tr>` : `<tr><th>วันและเวลาแก้ไข</th><td>${escapeHtml(latestCorr.correctionDateTime)}</td></tr><tr><th>ผู้ลงมือแก้ไข</th><td>${escapeHtml(latestCorr.correctedBy)}</td></tr><tr><th>ผู้ตรวจสอบ (จป.)</th><td>${escapeHtml(latestCorr.recordedBy)}</td></tr><tr><th>รายละเอียดการแก้ไข</th><td>${escapeHtml(latestCorr.correctionDetail)}</td></tr>`;
-    return `<article class="report-page"><div class="doc-header"><div><div class="doc-company">${escapeHtml(BRAND_CONFIG.companyName)}</div><h1>รายงานความเสี่ยงและผลการแก้ไข (${escapeHtml(BRAND_CONFIG.systemName)})</h1><div class="doc-id">รหัสรายงาน: ${escapeHtml(report.reportId)}</div></div><span class="status-badge">${escapeHtml(report.status)}</span></div><h2>1. ข้อมูลความเสี่ยงที่ตรวจพบ</h2><table><tr><th>วันและเวลาที่พบ</th><td>${escapeHtml(report.reportDateTime)}</td></tr><tr><th>พื้นที่ปฏิบัติงาน</th><td>${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</td></tr><tr><th>ตำแหน่งที่พบ</th><td>${escapeHtml(report.locationDetail)}</td></tr><tr><th>ประเภทอันตราย</th><td>${escapeHtml(report.hazardCategory)}</td></tr><tr><th>สภาพการณ์ที่ไม่ปลอดภัย</th><td>${escapeHtml(report.unsafeCondition)}</td></tr><tr><th>อุบัติเหตุที่อาจเกิดขึ้น</th><td>${escapeHtml(report.potentialIncident)}</td></tr><tr><th>แนวทางควบคุมระยะยาว</th><td>${escapeHtml(report.longTermControl || '-')}</td></tr><tr><th>ผู้รายงาน / ผู้รับผิดชอบ</th><td>${escapeHtml(report.reporter)} / ${escapeHtml(report.supervisor || '-')}</td></tr></table><h2>2. บันทึกผลการดำเนินการแก้ไข</h2><table>${corrRows}</table><h2>3. หลักฐานภาพถ่ายเปรียบเทียบ (Before / After)</h2><div class="ba-grid"><div class="ba-box"><div class="ba-title ba-before">ภาพก่อนแก้ไข (Before)</div>${beforeImg ? `<img src="${escapeHtml(beforeImg)}" alt="Before">` : `<p class="muted">ไม่มีภาพถ่าย</p>`}</div><div class="ba-box"><div class="ba-title ba-after">ภาพหลังแก้ไข (After)</div>${afterImg ? `<img src="${escapeHtml(afterImg)}" alt="After">` : `<p class="muted">ไม่มีภาพถ่าย</p>`}</div></div></article>`;
-  }
-
-  function executePrintWindow(title, bodyHtml) {
-    const fullHtml = `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><title>${escapeHtml(title)}</title><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet"><style>${getPrintStyles()}</style></head><body>${bodyHtml}<div class="print-footer">พิมพ์จากระบบ ${escapeHtml(BRAND_CONFIG.systemName)} (${escapeHtml(BRAND_CONFIG.companyName)}) เมื่อ ${escapeHtml(new Date().toLocaleString('th-TH'))}</div></body></html>`;
-    const printWin = window.open('', '_blank');
-    if (printWin) {
-      printWin.document.open(); printWin.document.write(fullHtml); printWin.document.close();
-      setTimeout(() => { printWin.focus(); printWin.print(); }, 600);
-    }
-  }
-
-  function printCurrentRiskReport() { if (!currentReportForPrint) return showToast('กรุณาเปิดดูรายละเอียดรายงานก่อนสั่งพิมพ์', 'error'); executePrintWindow('รายงาน ' + currentReportForPrint.reportId, buildSingleReportPrintHtml(currentReportForPrint)); }
-  function printFilteredReports() { const list = (Array.isArray(filteredRiskReports) && filteredRiskReports.length > 0) ? filteredRiskReports : allRiskReports; if (!list.length) return showToast('ไม่มีรายการให้พิมพ์', 'error'); executePrintWindow('รายงานความเสี่ยง SafeTrack', list.map(buildSingleReportPrintHtml).join('')); }
-
-  const chartColors = ['#0e9f9a','#e6a23c','#5279b8','#239b75','#9b72b0','#d66b6b','#6b9aab','#8c9b52'];
-
-  function renderDashboardAnalytics(reports, allReportsForTrend = null) {
-    const completed = reports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
-    const pending = reports.length - completed;
-    const alertBox = document.getElementById('overdueAlertContainer');
-    if (alertBox) {
-      const pendingItems = reports.filter(r => r.status !== 'แจ้งผลการแก้ไขแล้ว').map(r => ({ report: r, date: parseThaiDate(r.reportDateTime) })).filter(x => x.date !== null).sort((a, b) => a.date - b.date);
-      if (pendingItems.length > 0) {
-        const oldest = pendingItems[0];
-        const diffDays = Math.max(0, Math.floor((new Date() - oldest.date) / (1000 * 60 * 60 * 24)));
-        alertBox.innerHTML = `<div class="overdue-banner"><div><div class="overdue-title">⚠️ รายการค้างแก้ไขนานที่สุด: ${escapeHtml(oldest.report.reportId)} (${diffDays === 0 ? 'วันนี้' : `ค้างมาแล้ว ${diffDays} วัน`})</div><div class="overdue-desc">พื้นที่: ${escapeHtml([oldest.report.section, oldest.report.areaName].filter(Boolean).join(' / '))} — ${escapeHtml(oldest.report.locationDetail)}</div></div><button type="button" class="btn btn-orange btn-small" onclick="switchPage('corrections')">ไปบันทึกผลแก้ไข →</button></div>`;
-      } else alertBox.innerHTML = '';
-    }
-
-    document.getElementById('statusOverview').innerHTML = reports.length === 0 ? '<div class="empty-state">ยังไม่มีรายงานความเสี่ยงในช่วงเวลาที่เลือก</div>' : `<div class="donut-wrap">${buildDonutSvg([pending, completed], ['#e6a23c', '#239b75'], reports.length, 'ทั้งหมด')}<div class="chart-legend"><div class="legend-item"><span class="legend-dot" style="background:#e6a23c"></span><span>รอดำเนินการ</span><span class="legend-value">${pending} (${(pending/reports.length*100).toFixed(1)}%)</span></div><div class="legend-item"><span class="legend-dot" style="background:#239b75"></span><span>ดำเนินการแล้ว</span><span class="legend-value">${completed} (${(completed/reports.length*100).toFixed(1)}%)</span></div></div></div>`;
-
-    const catGroups = groupByKey(reports, r => r.hazardCategory || 'ไม่ระบุ');
-    document.getElementById('hazardCategoryChart').innerHTML = !catGroups.length ? '<div class="empty-state">ยังไม่มีข้อมูล</div>' : `<div class="donut-wrap">${buildDonutSvg(catGroups.map(x => x.total), catGroups.map((_, i) => chartColors[i % chartColors.length]), reports.length, 'รายการ')}<div class="chart-legend">${catGroups.map((g, i) => `<div class="legend-item"><span class="legend-dot" style="background:${chartColors[i % chartColors.length]}"></span><span>${escapeHtml(g.label)}</span><span class="legend-value">${g.total}</span></div>`).join('')}</div></div>`;
-
-    const areaGroups = groupByKey(reports, r => [r.section, r.areaName].filter(Boolean).join(' / ') || 'ไม่ระบุ');
-    const maxArea = areaGroups[0] ? areaGroups[0].total : 1;
-    document.getElementById('areaReportsChart').innerHTML = !areaGroups.length ? '<div class="empty-state">ยังไม่มีข้อมูล</div>' : `<div class="bar-list">${areaGroups.slice(0, 7).map((g, i) => `<div class="bar-row"><div>${escapeHtml(g.label)}</div><div class="bar-track"><div class="bar-fill" style="width:${(g.total/maxArea*100)}%; background:${chartColors[i % chartColors.length]}"></div></div><div class="bar-value">${g.total}</div></div>`).join('')}</div>`;
-
-    renderMonthlyTrend(allReportsForTrend || reports);
-
-    document.getElementById('areaSummaryTable').innerHTML = areaGroups.length ? `<table class="dashboard-data-table"><thead><tr><th>พื้นที่</th><th class="num">ทั้งหมด</th><th class="num">รอแก้ไข</th><th class="num">แก้ไขแล้ว</th></tr></thead><tbody>${areaGroups.map(g => { const sub = reports.filter(r => ([r.section, r.areaName].filter(Boolean).join(' / ') || 'ไม่ระบุ') === g.label); const done = sub.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length; return `<tr><td>${escapeHtml(g.label)}</td><td class="num">${g.total}</td><td class="num">${g.total - done}</td><td class="num">${done}</td></tr>`; }).join('')}</tbody></table>` : '<div class="empty-state">ไม่มีข้อมูล</div>';
-    document.getElementById('hazardSummaryTable').innerHTML = catGroups.length ? `<table class="dashboard-data-table"><thead><tr><th>ประเภทอันตราย</th><th class="num">จำนวน</th><th class="num">สัดส่วน</th></tr></thead><tbody>${catGroups.map(g => `<tr><td>${escapeHtml(g.label)}</td><td class="num">${g.total}</td><td class="num">${(g.total/reports.length*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">ไม่มีข้อมูล</div>';
-    document.getElementById('dashboardLatestTable').innerHTML = reports.length ? `<table class="dashboard-data-table"><thead><tr><th>รหัส</th><th>วันที่พบ</th><th>พื้นที่</th><th>ประเภท</th><th>สถานะ</th></tr></thead><tbody>${reports.slice(0, 10).map(r => `<tr><td>${escapeHtml(r.reportId)}</td><td>${escapeHtml(r.reportDateTime)}</td><td>${escapeHtml([r.section, r.areaName].filter(Boolean).join(' / '))}</td><td>${escapeHtml(r.hazardCategory)}</td><td>${escapeHtml(r.status)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">ไม่มีข้อมูล</div>';
-  }
-
-  function renderMonthlyTrend(reports) {
-    const el = document.getElementById('monthlyTrendChart');
-    const valid = reports.map(r => parseThaiDate(r.reportDateTime)).filter(Boolean);
-    if (!valid.length) return el.innerHTML = '<div class="empty-state">ไม่มีข้อมูลวันที่สำหรับแสดงแนวโน้ม</div>';
-    const latest = new Date(Math.max(...valid.map(d => d.getTime())));
-    const months = [];
-    for (let i = 5; i >= 0; i--) { const d = new Date(latest.getFullYear(), latest.getMonth() - i, 1); months.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label: d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' }), total: 0 }); }
-    valid.forEach(d => { const m = months.find(x => x.key === `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`); if (m) m.total++; });
-    const max = Math.max(1, ...months.map(m => m.total));
-    const w = 680, h = 200, left = 36, right = 20, top = 20, bottom = 36, plotW = w - left - right, plotH = h - top - bottom;
-    const pts = months.map((m, i) => ({ x: left + (i * plotW / (months.length - 1)), y: top + plotH - (m.total / max) * plotH, m }));
-    el.innerHTML = `<svg class="trend-svg" viewBox="0 0 ${w} ${h}"><line x1="${left}" y1="${top + plotH}" x2="${w - right}" y2="${top + plotH}" stroke="#cbd5e1"/><polyline points="${pts.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#0e9f9a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#0e9f9a"/><text x="${p.x}" y="${p.y - 9}" text-anchor="middle" font-size="11" font-weight="700" fill="#142b45">${p.m.total}</text><text x="${p.x}" y="${h - 10}" text-anchor="middle" font-size="11" fill="#64748b">${p.m.label}</text>`).join('')}</svg>`;
-  }
-
-  function buildDonutSvg(values, colors, total, caption) {
-    const r = 46, c = 2 * Math.PI * r; let offset = 0;
-    const circles = values.map((v, i) => { const len = total > 0 ? (v / total) * c : 0; const str = `<circle cx="70" cy="70" r="${r}" fill="none" stroke="${colors[i]}" stroke-width="20" stroke-dasharray="${len.toFixed(2)} ${(c - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 70 70)"/>`; offset += len; return str; }).join('');
-    return `<svg class="donut-svg" viewBox="0 0 140 140"><circle cx="70" cy="70" r="${r}" fill="none" stroke="#edf1f5" stroke-width="20"/>${circles}<text x="70" y="68" text-anchor="middle" font-size="22" font-weight="800" fill="#142b45">${total}</text><text x="70" y="84" text-anchor="middle" font-size="10" fill="#64748b">${escapeHtml(caption)}</text></svg>`;
-  }
-
-  function printDashboard() {
-    const select = document.getElementById('dashboardMonthFilter');
-    const periodLabel = select ? select.options[select.selectedIndex].text.replace(/^[📊📅]\s*/, '') : 'ภาพรวมทั้งหมด';
-    const clone = document.getElementById('page-dashboard').cloneNode(true);
-    clone.querySelectorAll('.dashboard-toolbar, .dashboard-actions, #dashboardMessage, .stat-icon-badge, #overdueAlertContainer').forEach(el => el.remove());
-    executePrintWindow('สรุปภาพรวม SafeTrack - ' + periodLabel, `<div style="border-bottom:2px solid #0e9f9a; padding-bottom:6px; margin-bottom:12px;"><div style="font-weight:700; color:#475569;">${escapeHtml(BRAND_CONFIG.companyName)}</div><h1 style="font-size:16pt; color:#142b45; margin:2px 0;">สรุปภาพรวมความปลอดภัยในการทำงาน (${escapeHtml(BRAND_CONFIG.systemName)})</h1><div style="font-weight:700; color:#087d79;">ช่วงเวลาข้อมูล: ${escapeHtml(periodLabel)}</div></div><style>.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.stat-card,.card{border:1px solid #cbd5e1;border-radius:8px;padding:10px;margin-bottom:10px;break-inside:avoid}.stat-value{font-size:18pt;font-weight:800}.dashboard-chart-grid,.dashboard-table-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chart-wide{grid-column:1/-1}.card-title{font-size:11pt;margin:0 0 6px;color:#142b45}.card-description{display:none}.donut-svg{width:105px;height:105px;flex-basis:105px}.donut-wrap{display:flex;align-items:center;gap:14px}.bar-row{display:grid;grid-template-columns:1fr 2fr auto;gap:8px;align-items:center;font-size:8.5pt;margin-bottom:4px}.bar-track{height:8px;background:#e2e8f0;border-radius:6px;overflow:hidden}.bar-fill{height:100%}</style>${clone.innerHTML}`);
-  }
-
-  function loadActivityHistory(notify = false) {
-    const list = document.getElementById('historyList');
-    list.innerHTML = '<div class="skeleton-box"></div><div class="skeleton-box"></div>';
-    callSafeTrackApi('getActivityHistory').then(res => {
-      if (!res || !res.success) return showBoxMessage('historyMessage', (res && res.message) || 'โหลดประวัติไม่สำเร็จ', 'error');
-      allHistoryData = res.data || [];
-      const corrCount = allHistoryData.filter(x => x.action.includes('แก้ไข')).length;
-      document.getElementById('historyTotal').textContent = allHistoryData.length.toLocaleString('th-TH');
-      document.getElementById('historyReportTotal').textContent = (allHistoryData.length - corrCount).toLocaleString('th-TH');
-      document.getElementById('historyCorrectionTotal').textContent = corrCount.toLocaleString('th-TH');
-      filterActivityHistory();
-      if (notify) showToast('อัปเดตประวัติการดำเนินงานแล้ว');
-    }).catch(err => showBoxMessage('historyMessage', 'โหลดประวัติไม่สำเร็จ: ' + getErrorMessage(err), 'error'));
-  }
-
-  function filterActivityHistory() {
-    const kw = document.getElementById('historySearch').value.trim().toLowerCase();
-    const type = document.getElementById('historyTypeFilter').value;
-    const filtered = allHistoryData.filter(item => {
-      const isCorr = item.action.includes('แก้ไข');
-      const matchType = !type || (type === 'correction' && isCorr) || (type === 'report' && !isCorr);
-      const text = [item.reportId, item.action, item.actionBy, item.detail, item.areaText, item.locationDetail].join(' ').toLowerCase();
-      return matchType && (!kw || text.includes(kw));
-    });
-    document.getElementById('historyResultCount').textContent = `แสดง ${filtered.length} กิจกรรม จากทั้งหมด ${allHistoryData.length} กิจกรรม`;
-    const list = document.getElementById('historyList'); list.innerHTML = '';
-    if (!filtered.length) return list.innerHTML = '<div class="empty-state">ไม่พบประวัติกิจกรรม</div>';
-    filtered.forEach(item => {
-      const isCorr = item.action.includes('แก้ไข');
-      const div = document.createElement('div'); div.className = 'history-item';
-      div.innerHTML = `<div class="history-icon ${isCorr ? 'correction' : ''}">${isCorr ? '✓' : '+'}</div><div><div class="history-heading"><div class="history-action">${escapeHtml(item.action)}</div><div class="history-date">${escapeHtml(item.actionDateTime)}</div></div><div class="history-report-id">รหัสรายงาน: ${escapeHtml(item.reportId)}</div><div class="history-description">${escapeHtml(item.detail)}</div><div class="history-meta"><span>โดย: ${escapeHtml(item.actionBy)}</span><span>พื้นที่: ${escapeHtml(item.areaText || '-')}</span></div></div>`;
-      list.appendChild(div);
-    });
-  }
-
-function openUserGuideModal(forceShow = false) {
-    const STORAGE_KEY = 'safetrack_guide_seen_v1';
+  /* ================= USER GUIDE MODAL (WITH THAI SVG ILLUSTRATIONS) ================= */
+  function openUserGuideModal(forceShow = false) {
+    const STORAGE_KEY = 'safetrack_guide_seen_v2';
     if (!forceShow && localStorage.getItem(STORAGE_KEY) === 'true') return;
     const existing = document.getElementById('userGuideBackdrop');
     if (existing) existing.remove();
@@ -1425,7 +978,7 @@ function openUserGuideModal(forceShow = false) {
     };
     backdrop.addEventListener('click', e => { if (e.target === backdrop) closeGuide(); });
 
-const svgStep1 = `
+    const svgStep1 = `
       <svg viewBox="0 0 180 115" width="100%" height="100%" font-family="Prompt, sans-serif">
         <rect x="8" y="8" width="164" height="99" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
         <path d="M8 16 Q8 8 16 8 L164 8 Q172 8 172 16 L172 28 L8 28 Z" fill="#0e9f9a"/>
@@ -1472,8 +1025,9 @@ const svgStep1 = `
         <text x="132" y="80" text-anchor="middle" font-size="7" font-weight="600" fill="#16a34a">ปิดงานเรียบร้อย</text>
         <text x="132" y="91" text-anchor="middle" font-size="6" fill="#22c55e">(After)</text>
       </svg>`;
+
     backdrop.innerHTML = `
-      <div class="modal-box" style="width: min(650px, 100%);">
+      <div class="modal-box">
         <div class="modal-header">
           <h3 class="modal-title"><span style="font-size:22px;">🦺</span> คู่มือการใช้งาน ${escapeHtml(BRAND_CONFIG.systemName)}</h3>
           <button type="button" class="modal-close" id="closeGuideXBtn">×</button>
@@ -1491,7 +1045,7 @@ const svgStep1 = `
             <div class="guide-visual-box">${svgStep2}</div>
             <div>
               <div class="guide-step-header"><span class="guide-step-num">2</span><div class="guide-step-title">แชร์แจ้งเตือนเข้ากลุ่ม LINE</div></div>
-              <div class="guide-step-desc">หลังบันทึกสำเร็จ กดปุ่ม <strong>"ส่งรูปภาพ + คัดลอกข้อความเข้า LINE"</strong> เพื่อแจ้งเตือนผู้รับผิดชอบในกลุ่มไลน์ทันที</div>
+              <div class="guide-step-desc">หลังบันทึกสำเร็จ กดปุ่ม <strong>"ส่งเข้ากลุ่ม LINE"</strong> เพื่อคัดลอกข้อความและแจ้งเตือนผู้รับผิดชอบในกลุ่มไลน์ทันที</div>
             </div>
           </div>
           <div class="guide-step-card">
@@ -1513,13 +1067,557 @@ const svgStep1 = `
     document.getElementById('confirmGuideBtn').addEventListener('click', closeGuide);
   }
 
-  function setCurrentDateTime(id) { const input = document.getElementById(id); if (!input) return; const now = new Date(); input.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
+  /* ================= NAVIGATION & DATA LOADING ================= */
+  function setupNavigation() {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', () => switchPage(btn.dataset.page));
+    });
+  }
+
+  function switchPage(page) {
+    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+    const info = pageInformation[page];
+    if (info) {
+      document.getElementById('pageTitle').textContent = info.title;
+      document.getElementById('pageSubtitle').textContent = info.subtitle;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (page === 'history' && allHistoryData.length === 0) loadActivityHistory();
+  }
+
+  function loadMasterData() {
+    callSafeTrackApi('getInitialMasterData').then(res => {
+      if (!res || !res.success) return;
+      areaData = res.areas || [];
+      userData = res.users || [];
+      populateSelect('reporterSelect', userData, 'fullName', 'fullName', 'เลือกผู้รายงาน');
+      populateSelect('supervisorSelect', userData, 'fullName', 'fullName', 'เลือกผู้รับผิดชอบ (ถ้ามี)');
+      populateSelect('correctionRecordedBy', userData, 'fullName', 'fullName', 'เลือกผู้ตรวจสอบและบันทึกผล');
+
+      const sections = [...new Set(areaData.map(a => a.section).filter(Boolean))];
+      const sectionSelect = document.getElementById('sectionSelect');
+      sectionSelect.innerHTML = '<option value="">เลือกพื้นที่หลัก</option>';
+      sections.forEach(sec => {
+        const opt = document.createElement('option');
+        opt.value = sec;
+        opt.textContent = sec;
+        sectionSelect.appendChild(opt);
+      });
+      populateReportAreaFilter();
+    });
+  }
+
+  function populateSelect(elId, list, valKey, labelKey, placeholder) {
+    const select = document.getElementById(elId);
+    if (!select) return;
+    select.innerHTML = `<option value="">${placeholder}</option>`;
+    list.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item[valKey];
+      opt.textContent = item[labelKey];
+      select.appendChild(opt);
+    });
+  }
+
+  function updateAreaOptions() {
+    const section = document.getElementById('sectionSelect').value;
+    const areaSelect = document.getElementById('areaSelect');
+    areaSelect.innerHTML = '<option value="">เลือกพื้นที่ย่อย</option>';
+    areaData.filter(a => a.section === section).forEach(area => {
+      const opt = document.createElement('option');
+      opt.value = area.areaId;
+      opt.textContent = area.areaName;
+      areaSelect.appendChild(opt);
+    });
+  }
+
+  function loadFullSystemData() {
+    hideBoxMessage('dashboardMessage');
+    hideBoxMessage('reportsMessage');
+    hideBoxMessage('correctionListMessage');
+
+    callSafeTrackApi('getSafeTrackFullDataset').then(res => {
+      if (!res || !res.success) {
+        const errMsg = (res && res.message) || 'ไม่สามารถโหลดข้อมูลได้';
+        showBoxMessage('dashboardMessage', errMsg, 'error');
+        return;
+      }
+      allRiskReports = Array.isArray(res.reports) ? res.reports : [];
+      const summary = res.summary || {};
+      const pendingCount = Number(summary.pendingReports || 0);
+      const badge = document.getElementById('pendingNavBadge');
+      badge.textContent = pendingCount;
+      badge.classList.toggle('show', pendingCount > 0);
+
+      document.getElementById('totalReports').textContent = Number(summary.totalReports || 0).toLocaleString('th-TH');
+      document.getElementById('pendingReports').textContent = pendingCount.toLocaleString('th-TH');
+      document.getElementById('completedReports').textContent = Number(summary.completedReports || 0).toLocaleString('th-TH');
+      document.getElementById('activeAreas').textContent = Number(summary.activeAreas || 0).toLocaleString('th-TH');
+
+      renderDashboardAnalytics(allRiskReports);
+      populateReportAreaFilter();
+      filterRiskReports();
+      renderCorrectionReports(allRiskReports.filter(r => r.status === 'บันทึกความเสี่ยงแล้ว'));
+    }).catch(err => {
+      showBoxMessage('dashboardMessage', 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + getErrorMessage(err), 'error');
+    });
+  }
+
+  /* ================= MULTI-IMAGE COMPRESSION (MAX 6) ================= */
+  function compressSingleFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 1200;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round((h * MAX) / w); w = MAX; }
+            else { w = Math.round((w * MAX) / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve({ fileName: file.name, dataUrl: canvas.toDataURL('image/jpeg', 0.8) });
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setupMultiBeforeImageUpload() {
+    const input = document.getElementById('beforeImagesInput');
+    input.addEventListener('change', async function () {
+      const files = Array.from(input.files || []).filter(f => f.type.startsWith('image/'));
+      if (!files.length) return;
+      const remain = 6 - beforeCompressedList.length;
+      if (remain <= 0) { alert('แนบภาพได้สูงสุด 6 รูปครับ'); input.value = ''; return; }
+      const selected = files.slice(0, remain);
+      document.getElementById('beforeImageHint').textContent = 'กำลังบีบอัดรูปภาพ...';
+      for (const f of selected) {
+        const item = await compressSingleFile(f);
+        beforeCompressedList.push(item);
+      }
+      input.value = '';
+      renderBeforeMultiPreviews();
+    });
+  }
+
+  function renderBeforeMultiPreviews() {
+    const grid = document.getElementById('beforeMultiPreviewGrid');
+    const hint = document.getElementById('beforeImageHint');
+    grid.innerHTML = '';
+    beforeCompressedList.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'preview-thumb-card';
+      card.innerHTML = `<img src="${item.dataUrl}" alt="รูปที่ ${idx + 1}"><button type="button" class="remove-thumb-btn" onclick="removeBeforePhoto(${idx})">×</button>`;
+      grid.appendChild(card);
+    });
+    hint.textContent = beforeCompressedList.length
+      ? `แนบแล้ว ${beforeCompressedList.length} / 6 รูป`
+      : 'รองรับภาพจากกล้องมือถือสูงสุด 6 รูป ระบบจะปรับขนาดให้อัตโนมัติ';
+  }
+
+  function removeBeforePhoto(index) {
+    beforeCompressedList.splice(index, 1);
+    renderBeforeMultiPreviews();
+  }
+
+  function setupAfterImageUpload() {
+    const input = document.getElementById('afterImage');
+    input.addEventListener('change', async function () {
+      const file = input.files && input.files[0];
+      if (!file) return clearAfterImage();
+      document.getElementById('afterImageHint').textContent = 'กำลังปรับขนาดรูปภาพ...';
+      afterCompressedData = await compressSingleFile(file);
+      document.getElementById('afterPreview').src = afterCompressedData.dataUrl;
+      document.getElementById('afterPreviewWrap').style.display = 'block';
+      document.getElementById('afterImageHint').textContent = 'พร้อมอัปโหลดภาพหลังแก้ไข';
+    });
+  }
+
+  function clearAfterImage() {
+    document.getElementById('afterImage').value = '';
+    document.getElementById('afterPreview').removeAttribute('src');
+    document.getElementById('afterPreviewWrap').style.display = 'none';
+    document.getElementById('afterImageHint').textContent = 'รองรับภาพจากกล้องมือถือ ระบบจะปรับขนาดให้อัตโนมัติ';
+    afterCompressedData = null;
+  }
+
+  /* ================= SUBMIT RISK & CORRECTION ================= */
+  function submitRiskReport(event) {
+    event.preventDefault();
+    const btn = document.getElementById('saveRiskBtn');
+    hideBoxMessage('formMessage');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึกข้อมูล...';
+
+    const payload = {
+      reportDateTime: document.getElementById('reportDateTime').value,
+      reporter: document.getElementById('reporterSelect').value,
+      areaId: document.getElementById('areaSelect').value,
+      locationDetail: document.getElementById('locationDetail').value.trim(),
+      hazardCategory: document.getElementById('hazardCategory').value,
+      unsafeCondition: document.getElementById('unsafeCondition').value.trim(),
+      potentialIncident: document.getElementById('potentialIncident').value.trim(),
+      longTermControl: document.getElementById('longTermControl').value.trim(),
+      supervisor: document.getElementById('supervisorSelect').value,
+      beforeImages: beforeCompressedList
+    };
+
+    callSafeTrackApi('saveRiskReport', payload).then(res => {
+      btn.disabled = false;
+      btn.textContent = '💾 บันทึกรายงานความเสี่ยง';
+      if (res && res.success) {
+        showBoxMessage('formMessage', '✓ ' + res.message + ' (' + res.reportId + ')', 'success');
+        document.getElementById('riskForm').reset();
+        beforeCompressedList = [];
+        renderBeforeMultiPreviews();
+        setCurrentDateTime('reportDateTime');
+        updateAreaOptions();
+        loadFullSystemData();
+        allHistoryData = [];
+        if (res.summaryForLine) openLineShareModal('report', res.summaryForLine);
+      } else {
+        showBoxMessage('formMessage', (res && res.message) || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+      }
+    }).catch(err => {
+      btn.disabled = false;
+      btn.textContent = '💾 บันทึกรายงานความเสี่ยง';
+      showBoxMessage('formMessage', 'เกิดข้อผิดพลาด: ' + getErrorMessage(err), 'error');
+    });
+  }
+
+  function openLineShareModal(type, info) {
+    const existing = document.getElementById('lineShareBackdrop');
+    if (existing) existing.remove();
+
+    const messageText = type === 'report'
+      ? `⚠️ [แจ้งพบความเสี่ยง - SafeTrack]\nรหัส: ${info.reportId}\nวันที่/เวลา: ${info.reportDateTime}\nพื้นที่: ${info.areaText}\nจุดที่พบ: ${info.locationDetail}\nประเภท: ${info.hazardCategory}\nรายละเอียด: ${info.unsafeCondition}\nผู้รับผิดชอบ: ${info.supervisor}\nผู้รายงาน: ${info.reporter}${info.imageUrl ? `\nภาพประกอบ: ${info.imageUrl}` : ''}`
+      : `✅ [แจ้งผลการแก้ไขแล้ว - SafeTrack]\nรหัส: ${info.reportId}\nวันที่แก้ไข: ${info.correctionDateTime}\nผลการแก้ไข: ${info.correctionDetail}\nผู้ดำเนินการแก้ไข: ${info.correctedBy}\nผู้ตรวจสอบ (จป.): ${info.recordedBy}${info.imageUrl ? `\nภาพหลังแก้ไข: ${info.imageUrl}` : ''}`;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.id = 'lineShareBackdrop';
+    backdrop.innerHTML = `
+      <div class="modal-box" style="width:min(560px,100%);">
+        <div class="modal-header">
+          <h3 class="modal-title">📲 สรุปข้อความแจ้งกลุ่ม LINE</h3>
+          <button type="button" class="modal-close" onclick="document.getElementById('lineShareBackdrop').remove()">×</button>
+        </div>
+        <p style="font-size:13px; color:var(--muted); margin-top:0;">บันทึกข้อมูลลงระบบเรียบร้อยแล้ว สามารถคัดลอกข้อความด้านล่างเพื่อส่งแจ้งในกลุ่ม LINE ได้ทันที</p>
+        <div class="line-preview-box" id="lineShareText"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('lineShareBackdrop').remove()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn btn-primary" id="copyLineTextBtn">📋 คัดลอกข้อความ</button>
+          <a class="btn btn-line" style="text-decoration:none;" target="_blank" rel="noopener noreferrer" href="https://line.me/R/msg/text/?${encodeURIComponent(messageText)}">ส่งเข้า LINE ทันที ↗</a>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+    document.getElementById('lineShareText').textContent = messageText;
+    document.getElementById('copyLineTextBtn').addEventListener('click', function () {
+      navigator.clipboard.writeText(messageText);
+      this.textContent = '✓ คัดลอกแล้ว!';
+    });
+  }
+
+  /* ================= REPORTS, CORRECTIONS, DASHBOARD & HISTORY ================= */
+  function populateReportAreaFilter() {
+    const select = document.getElementById('reportAreaFilter');
+    const prev = select.value;
+    select.innerHTML = '<option value="">ทุกพื้นที่</option>';
+    const sections = [...new Set([...areaData.map(a => a.section), ...allRiskReports.map(r => r.section)].filter(Boolean))];
+    sections.forEach(sec => {
+      const opt = document.createElement('option');
+      opt.value = sec;
+      opt.textContent = sec;
+      select.appendChild(opt);
+    });
+    if (sections.includes(prev)) select.value = prev;
+  }
+
+  function filterRiskReports() {
+    const kw = document.getElementById('reportSearch').value.trim().toLowerCase();
+    const status = document.getElementById('reportStatusFilter').value;
+    const section = document.getElementById('reportAreaFilter').value;
+    filteredRiskReports = allRiskReports.filter(r => {
+      const text = [r.reportId, r.reporter, r.locationDetail, r.hazardCategory, r.unsafeCondition, r.areaName, r.section].join(' ').toLowerCase();
+      return (!kw || text.includes(kw)) && (!status || r.status === status) && (!section || r.section === section);
+    });
+    renderAllRiskReports();
+  }
+
+  function renderAllRiskReports() {
+    const list = document.getElementById('allReportsList');
+    document.getElementById('reportResultCount').textContent = `แสดง ${filteredRiskReports.length} รายการ จากทั้งหมด ${allRiskReports.length} รายการ`;
+    list.innerHTML = '';
+    if (!filteredRiskReports.length) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">⌕</div>ไม่พบรายการที่ตรงกับเงื่อนไข</div>`;
+      return;
+    }
+    filteredRiskReports.forEach(report => {
+      const isCompleted = report.status === 'แจ้งผลการแก้ไขแล้ว';
+      const card = document.createElement('div');
+      card.className = 'report-card';
+      card.innerHTML = `
+        <div>
+          <div class="report-id">${escapeHtml(report.reportId)}</div>
+          <div class="report-location">${escapeHtml(report.locationDetail || 'ไม่ระบุตำแหน่ง')}</div>
+          <div class="report-meta">
+            <span>📅 ${escapeHtml(report.reportDateTime)}</span>
+            <span>📍 ${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</span>
+            <span>👤 ${escapeHtml(report.reporter)}</span>
+          </div>
+          <span class="tag">${escapeHtml(report.hazardCategory)}</span>
+          <div class="report-description">${escapeHtml(report.unsafeCondition)}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+          <span class="report-status ${isCompleted ? 'completed' : 'pending'}">${escapeHtml(report.status)}</span>
+          <button type="button" class="btn btn-primary btn-small view-detail-btn">ดูรายละเอียด</button>
+        </div>
+      `;
+      card.querySelector('.view-detail-btn').addEventListener('click', () => showAllReportDetail(report));
+      list.appendChild(card);
+    });
+  }
+
+  function showAllReportDetail(report) {
+    currentReportForPrint = report;
+    const container = document.getElementById('allReportDetail');
+    const isCompleted = report.status === 'แจ้งผลการแก้ไขแล้ว';
+    const corrections = Array.isArray(report.corrections) ? report.corrections : [];
+    const latestCorr = corrections.length ? corrections[corrections.length - 1] : null;
+
+    container.innerHTML = `
+      <div style="margin-bottom:12px;"><span class="report-status ${isCompleted ? 'completed' : 'pending'}">${escapeHtml(report.status)}</span></div>
+      <div class="detail-section-title">1. ข้อมูลความเสี่ยงที่ตรวจพบ</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">รหัสรายงาน</div><div class="detail-value">${escapeHtml(report.reportId)}</div></div>
+        <div class="detail-item"><div class="detail-label">วันและเวลาที่พบ</div><div class="detail-value">${escapeHtml(report.reportDateTime)}</div></div>
+        <div class="detail-item"><div class="detail-label">ผู้รายงาน</div><div class="detail-value">${escapeHtml(report.reporter)}</div></div>
+        <div class="detail-item"><div class="detail-label">พื้นที่ปฏิบัติงาน</div><div class="detail-value">${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</div></div>
+        <div class="detail-item"><div class="detail-label">ตำแหน่งที่พบ</div><div class="detail-value">${escapeHtml(report.locationDetail)}</div></div>
+        <div class="detail-item"><div class="detail-label">ประเภทอันตราย</div><div class="detail-value">${escapeHtml(report.hazardCategory)}</div></div>
+        <div class="detail-item"><div class="detail-label">สภาพการณ์ที่ไม่ปลอดภัย</div><div class="detail-value">${escapeHtml(report.unsafeCondition)}</div></div>
+        <div class="detail-item"><div class="detail-label">อุบัติเหตุที่อาจเกิดขึ้น</div><div class="detail-value">${escapeHtml(report.potentialIncident)}</div></div>
+      </div>
+      <div class="detail-section-title">2. ผลการดำเนินการแก้ไข</div>
+      ${latestCorr ? `
+        <div class="detail-grid">
+          <div class="detail-item"><div class="detail-label">วันและเวลาแก้ไข</div><div class="detail-value">${escapeHtml(latestCorr.correctionDateTime)}</div></div>
+          <div class="detail-item"><div class="detail-label">ผู้ลงมือแก้ไข / ผู้ตรวจสอบ</div><div class="detail-value">${escapeHtml(latestCorr.correctedBy)} / ${escapeHtml(latestCorr.recordedBy)}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">รายละเอียดการแก้ไข</div><div class="detail-value">${escapeHtml(latestCorr.correctionDetail)}</div></div>
+        </div>` : `<div class="empty-state" style="padding:18px;">⏳ อยู่ระหว่างรอดำเนินการแก้ไข</div>`}
+      <div class="detail-section-title">3. ภาพถ่ายเปรียบเทียบ (Before / After)</div>
+      <div class="ba-image-grid">
+        <div class="ba-image-card"><span class="ba-badge before">ก่อนแก้ไข (Before)</span>${renderDriveImageHtml(report.beforeImageFileId, report.beforeImageUrl, 'Before')}</div>
+        <div class="ba-image-card"><span class="ba-badge after">หลังแก้ไข (After)</span>${latestCorr ? renderDriveImageHtml(latestCorr.afterImageFileId, latestCorr.afterImageUrl, 'After') : '<div class="detail-value" style="color:var(--muted);">ยังไม่มีภาพหลังแก้ไข</div>'}</div>
+      </div>
+    `;
+    const card = document.getElementById('allReportDetailCard');
+    card.classList.remove('form-hidden');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderDriveImageHtml(fileId, url, altText) {
+    const imgSrc = getDriveDisplayUrl(fileId, url);
+    if (!imgSrc) return `<div class="detail-value" style="color:var(--muted); padding:20px 0;">ไม่มีภาพถ่ายแนบ</div>`;
+    return `<img class="report-detail-image" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(altText)}"><a class="before-image-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">เปิดดูภาพต้นฉบับใน Drive ↗</a>`;
+  }
+
+  function getDriveDisplayUrl(fileId, url) {
+    let id = String(fileId || '').split(',')[0].trim();
+    if (!id && url) {
+      const m = String(url).match(/\/file\/d\/([^/]+)/) || String(url).match(/[?&]id=([^&]+)/);
+      if (m) id = m[1];
+    }
+    return id ? 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1000' : (url || '');
+  }
+
+  function renderCorrectionReports(pendingList) {
+    const list = document.getElementById('correctionReportList');
+    document.getElementById('pendingCount').textContent = `รายการที่รอบันทึกผลการแก้ไข: ${pendingList.length} รายการ`;
+    list.innerHTML = '';
+    if (!pendingList.length) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">✓</div>ไม่มีรายการความเสี่ยงที่รอบันทึกผลการแก้ไข</div>`;
+      return;
+    }
+    pendingList.forEach(report => {
+      const card = document.createElement('div');
+      card.className = 'report-card';
+      card.innerHTML = `
+        <div>
+          <div class="report-id">${escapeHtml(report.reportId)}</div>
+          <div class="report-location">${escapeHtml(report.locationDetail)}</div>
+          <div class="report-meta"><span>📅 ${escapeHtml(report.reportDateTime)}</span><span>📍 ${escapeHtml([report.section, report.areaName].filter(Boolean).join(' / '))}</span></div>
+          <div class="report-description">${escapeHtml(report.unsafeCondition)}</div>
+        </div>
+        <button type="button" class="btn btn-primary btn-small select-corr-btn">เลือกบันทึกผล</button>
+      `;
+      card.querySelector('.select-corr-btn').addEventListener('click', () => {
+        selectedCorrectionReport = report;
+        document.getElementById('selectedReportDetail').innerHTML = `<div class="detail-grid"><div class="detail-item"><div class="detail-label">รหัส</div><div class="detail-value">${escapeHtml(report.reportId)}</div></div><div class="detail-item"><div class="detail-label">ตำแหน่ง</div><div class="detail-value">${escapeHtml(report.locationDetail)}</div></div><div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">รายละเอียด</div><div class="detail-value">${escapeHtml(report.unsafeCondition)}</div></div></div>`;
+        document.getElementById('selectedReportCard').classList.remove('form-hidden');
+        document.getElementById('correctionFormCard').classList.remove('form-hidden');
+        resetCorrectionForm(true);
+      });
+      list.appendChild(card);
+    });
+  }
+
+  function clearSelectedReport() {
+    selectedCorrectionReport = null;
+    document.getElementById('selectedReportCard').classList.add('form-hidden');
+    document.getElementById('correctionFormCard').classList.add('form-hidden');
+  }
+
+  function resetCorrectionForm(clearMsg) {
+    document.getElementById('correctionForm').reset();
+    setCurrentDateTime('correctionDateTime');
+    clearAfterImage();
+    if (clearMsg) hideBoxMessage('correctionMessage');
+  }
+
+  function submitCorrection(event) {
+    event.preventDefault();
+    if (!selectedCorrectionReport) return;
+    const btn = document.getElementById('saveCorrectionBtn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึกผล...';
+
+    callSafeTrackApi('saveCorrection', {
+      reportId: selectedCorrectionReport.reportId,
+      correctionDateTime: document.getElementById('correctionDateTime').value,
+      correctedBy: document.getElementById('correctedBy').value.trim(),
+      correctionDetail: document.getElementById('correctionDetail').value.trim(),
+      recordedBy: document.getElementById('correctionRecordedBy').value,
+      afterImageDataUrl: afterCompressedData ? afterCompressedData.dataUrl : ''
+    }).then(res => {
+      btn.disabled = false;
+      btn.textContent = '✓ ยืนยันบันทึกผลการแก้ไข';
+      if (res && res.success) {
+        showBoxMessage('correctionMessage', '✓ ' + res.message, 'success');
+        clearSelectedReport();
+        loadFullSystemData();
+        allHistoryData = [];
+        if (res.summaryForLine) openLineShareModal('correction', res.summaryForLine);
+      } else {
+        showBoxMessage('correctionMessage', (res && res.message) || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }).catch(err => {
+      btn.disabled = false;
+      btn.textContent = '✓ ยืนยันบันทึกผลการแก้ไข';
+      showBoxMessage('correctionMessage', 'เกิดข้อผิดพลาด: ' + getErrorMessage(err), 'error');
+    });
+  }
+
+  const chartColors = ['#0e9f9a','#e6a23c','#5279b8','#239b75','#9b72b0','#d66b6b'];
+
+  function renderDashboardAnalytics(reports) {
+    const completed = reports.filter(r => r.status === 'แจ้งผลการแก้ไขแล้ว').length;
+    const pending = reports.length - completed;
+    const statusEl = document.getElementById('statusOverview');
+    statusEl.innerHTML = !reports.length
+      ? '<div class="empty-state">ยังไม่มีรายงานความเสี่ยงในระบบ</div>'
+      : `<div class="donut-wrap">${buildDonutSvg([pending, completed], ['#e6a23c', '#239b75'], reports.length, 'ทั้งหมด')}<div class="chart-legend"><div class="legend-item"><span class="legend-dot" style="background:#e6a23c"></span><span>รอดำเนินการ</span><span class="legend-value">${pending}</span></div><div class="legend-item"><span class="legend-dot" style="background:#239b75"></span><span>ดำเนินการแล้ว</span><span class="legend-value">${completed}</span></div></div></div>`;
+
+    const catGroups = groupByKey(reports, r => r.hazardCategory || 'ไม่ระบุ');
+    document.getElementById('hazardCategoryChart').innerHTML = !catGroups.length
+      ? '<div class="empty-state">ยังไม่มีข้อมูล</div>'
+      : `<div class="donut-wrap">${buildDonutSvg(catGroups.map(x => x.total), catGroups.map((_, i) => chartColors[i % chartColors.length]), reports.length, 'รายการ')}<div class="chart-legend">${catGroups.map((g, i) => `<div class="legend-item"><span class="legend-dot" style="background:${chartColors[i % chartColors.length]}"></span><span>${escapeHtml(g.label)}</span><span class="legend-value">${g.total}</span></div>`).join('')}</div></div>`;
+
+    const areaGroups = groupByKey(reports, r => [r.section, r.areaName].filter(Boolean).join(' / ') || 'ไม่ระบุ');
+    const maxArea = areaGroups.length ? areaGroups[0].total : 1;
+    document.getElementById('areaReportsChart').innerHTML = !areaGroups.length
+      ? '<div class="empty-state">ยังไม่มีข้อมูล</div>'
+      : `<div class="bar-list">${areaGroups.slice(0, 6).map((g, i) => `<div class="bar-row"><div>${escapeHtml(g.label)}</div><div class="bar-track"><div class="bar-fill" style="width:${(g.total/maxArea*100)}%; background:${chartColors[i % chartColors.length]}"></div></div><div class="bar-value">${g.total}</div></div>`).join('')}</div>`;
+
+    document.getElementById('monthlyTrendChart').innerHTML = !reports.length
+      ? '<div class="empty-state">ยังไม่มีข้อมูลแนวโน้ม</div>'
+      : `<div class="empty-state">มีข้อมูลสะสมทั้งหมด ${reports.length} รายการ</div>`;
+
+    document.getElementById('areaSummaryTable').innerHTML = areaGroups.length
+      ? `<table class="dashboard-data-table"><thead><tr><th>พื้นที่</th><th class="num">ทั้งหมด</th></tr></thead><tbody>${areaGroups.map(g => `<tr><td>${escapeHtml(g.label)}</td><td class="num">${g.total}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty-state">ไม่มีข้อมูล</div>';
+
+    document.getElementById('hazardSummaryTable').innerHTML = catGroups.length
+      ? `<table class="dashboard-data-table"><thead><tr><th>ประเภทอันตราย</th><th class="num">จำนวน</th></tr></thead><tbody>${catGroups.map(g => `<tr><td>${escapeHtml(g.label)}</td><td class="num">${g.total}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty-state">ไม่มีข้อมูล</div>';
+
+    document.getElementById('dashboardLatestTable').innerHTML = reports.length
+      ? `<table class="dashboard-data-table"><thead><tr><th>รหัส</th><th>วันที่พบ</th><th>พื้นที่</th><th>ประเภท</th><th>สถานะ</th></tr></thead><tbody>${reports.slice(0, 10).map(r => `<tr><td>${escapeHtml(r.reportId)}</td><td>${escapeHtml(r.reportDateTime)}</td><td>${escapeHtml([r.section, r.areaName].filter(Boolean).join(' / '))}</td><td>${escapeHtml(r.hazardCategory)}</td><td>${escapeHtml(r.status)}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="empty-state">ไม่มีข้อมูล</div>';
+  }
+
+  function buildDonutSvg(values, colors, total, caption) {
+    const r = 46, c = 2 * Math.PI * r;
+    let offset = 0;
+    const circles = values.map((v, i) => {
+      const len = total > 0 ? (v / total) * c : 0;
+      const str = `<circle cx="70" cy="70" r="${r}" fill="none" stroke="${colors[i]}" stroke-width="20" stroke-dasharray="${len.toFixed(2)} ${(c - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
+      offset += len;
+      return str;
+    }).join('');
+    return `<svg class="donut-svg" viewBox="0 0 140 140"><circle cx="70" cy="70" r="${r}" fill="none" stroke="#edf1f5" stroke-width="20"/>${circles}<text x="70" y="68" text-anchor="middle" font-size="22" font-weight="800" fill="#142b45">${total}</text><text x="70" y="84" text-anchor="middle" font-size="10" fill="#64748b">${escapeHtml(caption)}</text></svg>`;
+  }
+
+  function printCurrentRiskReport() { if (currentReportForPrint) window.print(); }
+  function printFilteredReports() { window.print(); }
+  function printDashboard() { window.print(); }
+
+  function loadActivityHistory() {
+    callSafeTrackApi('getActivityHistory').then(res => {
+      if (!res || !res.success) return;
+      allHistoryData = res.data || [];
+      const corrCount = allHistoryData.filter(x => x.action.includes('แก้ไข')).length;
+      document.getElementById('historyTotal').textContent = allHistoryData.length;
+      document.getElementById('historyReportTotal').textContent = allHistoryData.length - corrCount;
+      document.getElementById('historyCorrectionTotal').textContent = corrCount;
+      filterActivityHistory();
+    });
+  }
+
+  function filterActivityHistory() {
+    const kw = document.getElementById('historySearch').value.trim().toLowerCase();
+    const type = document.getElementById('historyTypeFilter').value;
+    const filtered = allHistoryData.filter(item => {
+      const isCorr = item.action.includes('แก้ไข');
+      const matchType = !type || (type === 'correction' && isCorr) || (type === 'report' && !isCorr);
+      return matchType && (!kw || [item.reportId, item.action, item.actionBy, item.detail].join(' ').toLowerCase().includes(kw));
+    });
+    document.getElementById('historyResultCount').textContent = `แสดง ${filtered.length} กิจกรรม จากทั้งหมด ${allHistoryData.length} กิจกรรม`;
+    const list = document.getElementById('historyList');
+    list.innerHTML = filtered.length ? filtered.map(item => `
+      <div class="history-item">
+        <div class="history-icon ${item.action.includes('แก้ไข') ? 'correction' : ''}">${item.action.includes('แก้ไข') ? '✓' : '＋'}</div>
+        <div>
+          <div class="history-heading"><div class="history-action">${escapeHtml(item.action)}</div><div class="history-date">${escapeHtml(item.actionDateTime)}</div></div>
+          <div class="history-report-id">รหัสรายงาน: ${escapeHtml(item.reportId)}</div>
+          <div class="history-description">${escapeHtml(item.detail)}</div>
+          <div class="history-meta"><span>👤 โดย: ${escapeHtml(item.actionBy)}</span></div>
+        </div>
+      </div>`).join('') : '<div class="empty-state">ไม่พบประวัติกิจกรรม</div>';
+  }
+
+  function setCurrentDateTime(id) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    const now = new Date();
+    input.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  }
   function showBoxMessage(id, msg, type) { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'message ' + type; el.style.display = 'block'; } }
   function hideBoxMessage(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
-  function groupByKey(items, fn) { const map = new Map(); items.forEach(item => { const k = fn(item); map.set(k, (map.get(k) || 0) + 1); }); return Array.from(map.entries()).map(([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total); }
-  function parseThaiDate(str) { if (!str) return null; const m = String(str).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if (!m) return null; let y = Number(m[3]); if (y > 2400) y -= 543; return new Date(y, Number(m[2]) - 1, Number(m[1])); }
+  function groupByKey(items, fn) { const map = new Map(); items.forEach(i => { const k = fn(i); map.set(k, (map.get(k) || 0) + 1); }); return Array.from(map.entries()).map(([label, total]) => ({ label, total })).sort((a, b) => b.total - a.total); }
   function escapeHtml(val) { return String(val == null ? '' : val).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
-  function getErrorMessage(err) { return err ? (err.message || String(err)) : 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ'; }
+  function getErrorMessage(err) { return err ? (err.message || String(err)) : 'เกิดข้อผิดพลาด'; }
 </script>
 </body>
 </html>
